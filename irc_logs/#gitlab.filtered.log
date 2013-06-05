@@ -1,0 +1,229 @@
+19:34 < FFForever> Hey hey
+20:08 < mcfoobar> Hi! Im trying to run gitlab under a sub uri with apache. I finally got it work. BUT: Some asset urls (not all)  are wrong. And even worse: the repositories can no longer be accessed, they 404.  Any ideas? I've been trying to get this working for hours.
+20:15 < dblessing> mcfoobar: https://groups.google.com/forum/#!msg/gitlabhq/mPcpq85VHew/4qupsUY90oEJ maybe that will help
+20:22 < mcfoobar> dblessing: thanks for your help. sadly, that does not change anything
+20:23 < dblessing> mcfoobar: ok. can you create a new vhost and proxy directly through?
+20:24 < mcfoobar> dblessing: you mean withouth passenger?
+20:24 < dblessing> no i mean serve it up at / instead of another context
+20:25 < mcfoobar> ah okay, yes I could do that, and that works. But I want to run it at /gitlab
+21:09 < manacit> I installed gitlab via turnkey (embarrassing, I know, but it's the easiest way to get it going on AWS) - I'm just wondering what the best way to get an automated backup system is? I keep getting "Don't know how to build task 'gitlab:backup:create" - any tips. I'm probably doing it wrong!
+21:11 < dblessing> manacit: i haven't explored the backup rake task yet but we just backup the database and the repositories directory and call it good
+21:12 < manacit> do you back up the actual /home/git/, or the individual repos? 
+21:12 < manacit> pardon the questions, just want to get it right
+22:17 < FFForever> manacit, Still having trouble?
+22:18 < manacit> I can't get gitlab:backup:create to run
+22:18 < manacit> I was thinking of just backing up /home/git and the mysqldb, but I like the idea of using the built in solution!
+22:19 < FFForever> Is there a backup task? I've croned postgres dump & tar zipped on a nightly basis for backups
+22:20 < manacit> there's supposed to be yeah
+22:21 < FFForever> How are you running it? RAILS_ENV=production rake gitlab:backup:create?
+22:21 < FFForever> I just found it.. I normally only use gitlab:check hehe
+22:21 < manacit> https://github.com/gitlabhq/gitlabhq/blob/master/doc/raketasks/backup_restore.md
+22:21 < manacit> bundle exec rake gitlab:backup:create RAILS_ENV=production
+22:22 < FFForever> SHould work. Are you running master or stable?
+22:22 < manacit> I believe stable - I just grabbed the AMI on AWS
+22:22 < manacit> which is stable - 12.0 
+22:23 < FFForever> there is no 12.0....
+22:23 < manacit> oh well
+22:24 < manacit> that's the ami version number
+22:24 < manacit> 2.2-11 (upstream archive)
+22:24 < FFForever> Gitlab is currently on 5.x
+22:24 < manacit> a micro instance is free
+22:24 < manacit> yeah I realized how old that is when I checked
+22:24 < manacit> damn
+22:25 < manacit> well in that case, never mind, I'll install it myself
+22:30 < FFForever> A micro instance is only free for 12 months :P
+22:38 < manacit> aww gitlab doesn't want to run on only 512mb of ram 
+22:38 < manacit> :(
+22:44 < FFForever> 512mb of ram is very little for a rails app.....
+23:21 < giany> anyone using a flow like dev-stage-prod? any hints regarding how can i accomplish this?
+23:32 < dblessing> giany: with regard to what? code flow? 
+23:32 < dblessing> we use feature branches for dev, develop branch for stage-ish servers, and deploy from tags for prod
+23:44 < giany> i'm interested in code flow
+23:45 < giany> basically now I have one repo, I can commit to it and push to origin
+23:45 < giany> this repo will be the dev one
+23:45 < giany> not sure how can i move a commit to stage/prod..
+23:45 < giany> any documentation regarding this?
+23:48 < dblessing> giany: i think that's just a git workflow issue instead of a gitlab one
+23:49 < dblessing> you probably don't need to move anything so to speak…rather just tag or use branches or do something else within the same repo.  that's kind of the point of git
+23:50 < dblessing> it's not necessary to have separate repos for dev/stage/prod.  unless you really, really want to.
+23:55 < dblessing> idk if this will help or cause confusion, but git it a look anyway - http://nvie.com/posts/a-successful-git-branching-model/
+04:56 < manacit> speaking as someone who is unfamiliar with gitlab, is " Failed to create satellite for Administrator / Project" an error I should be particularly concerned about
+05:07 < manacit> I ran sudo -u gitlab -H bundle exec rake gitlab:satellites:create RAILS_ENV=production and it seemed to work!
+05:12 < geck> manacit: ah-hah
+05:12 < geck> thanks
+05:12 < geck> I've been hitting that with some of my stuff on miport repos
+05:12 < geck> imported repos
+05:12 < manacit> I had to make a directory
+05:13 < manacit> sudo -u gitlab -H mkdir /home/gitlab/gitlab-satellites
+05:13 < manacit> the installer doesn't make it by default
+05:14 < geck> mm
+05:14 < geck> ya, you have to do that by hand
+05:14 < geck> that may not work for me then
+05:14 < geck> I have 24 repos that work just fine
+05:14 < geck> thena  couple that I imported after the 5.0 -> 5.1 update
+05:14 < geck> that just don't work quite right
+07:50 < manacit> has anyone gone 4.0 -> 5.0
+07:50 < manacit> or should I just reinstall and go with 5.0
+07:53 < manacit> meh I might just go with bitnami !
+14:49 < LndGoncalves> hi
+14:50 < dblessing> hey LndGoncalves 
+15:20 < LndGoncalves> Guys, how do I authenticate User via password? and not just the key.
+15:20 < dblessing> LndGoncalves: via api you mean? using internal auth or LDAP?
+15:26 < LndGoncalves> umm no,
+15:26 < LndGoncalves> for a simple "git push" is needed a password.
+15:48 < LndGoncalves> dblessing, 
+15:50 < LndGoncalves> I'm using the Simple Authentication gitlab
+15:50 < LndGoncalves> but I can change if necessary.
+15:50 < LndGoncalves> what I want, and to make any changes to a push type, the user must enter a password.
+15:52 < dblessing> LndGoncalves: ah yes you must use a key.  no way around that
+16:03 < bigjay> Hi
+16:04 < LndGoncalves> hi
+16:05 < bigjay> can i use gitlab without a webserver?
+16:07 < bigjay> or to put it in other words:
+16:07 < bigjay> i followed the installation guide at 
+16:07 < bigjay> https://github.com/gitlabhq/gitlabhq/blob/master/doc/install/installation.md#advanced-setup-tips
+16:08 < bigjay> to point 7
+16:08 < bigjay> but i want to use apache2 
+16:09 < bigjay> can anyone point me to a working howto for gitlab 5.1?
+16:15 < dblessing> bigjay: you can use apache, but you'll need something else with it.  you could do apache with passenger and run it that way, although i've never done it.  or you could still run gitlab on puma and just proxy through apache
+16:16 < dblessing> bigjay: so instead of following nginx settings for number 7, just use standard apache configuration to connect to a unix socket. must like this post talks about http://stackoverflow.com/questions/5780886/proxy-apache-load-balancers-to-a-unix-socket-instead-of-a-port
+16:17 < dblessing> bigjay: hmm never mind don't use that post.  bad example :) idk how to proxy with apache to a unix socket, or if it's possible.  alternatively, modify the puma config to run on a port instead of a socket. then you just use normal apache proxy pass 
+16:17 < bigjay> how can i check if puma is accesible?
+16:18 < bigjay> +s
+16:18 < bigjay> in my gitlab.yml I specified a port 
+16:19 < dblessing> if you follow the directions from gitlab, it will have puma create a socket.  but if you want to hit it directly at a port you need to modify $GITLAB_HOME/config/puma.rb and comment out the unix:/ socket and uncomment the port
+16:19 < bigjay> after `/etc/service/gitlab start` shouldn't I be able to access gitlab on that port?
+16:19 < dblessing> puma doesn't listen on a port by default, with gitlab's config anyway.  it creates a unix socket
+16:20 < dblessing> you must edit puma.rb and exchange these two lines (uncomment one, comment the other)
+16:20 < dblessing> https://gist.github.com/bke-drewb/5547728
+16:20 < dblessing> reverse those...
+16:22 < dblessing> make sense?
+16:24 < bigjay> yep, and after i (re)start the gitlab service it print on the console:
+16:24 < bigjay> * Listening on tcp://0.0.0.0:9292
+16:24 < dblessing> awesome 
+16:25 < bigjay> but 
+16:25 < bigjay> lynx 0.0.0.0:9292
+16:25 < bigjay> says it could not connect
+16:25 < dblessing> well you can't do that :) 0.0.0.0 just means it's listening on all interfaces
+16:26 < bigjay> so how do I connect?
+16:26 < bigjay> localhost?
+16:26 < dblessing> yep
+16:26 < dblessing> or the box's IP address
+16:26 < dblessing> new to linux? :)
+16:26 < bigjay> LOL 
+16:27 < bigjay> nope, but we got admins for that at work - i am trying it at home - hoping to get the other devs to switch from svn to git
+16:28 < dblessing> ok haha
+16:29 < bigjay> nope, still nothing
+16:29 < bigjay> i am confused:
+16:29 < bigjay> why is there a port option in config/gitlab.yml
+16:30 < bigjay> what does it set?
+16:30 < bigjay> (a port obviously - but ??? )
+16:30 < dblessing> bigjay: i think it handles link creation and stuff like that for the web interface 
+16:30 < dblessing> so if you're not running on port 80, it needs to know so it can construct links accordingly
+16:31 < bigjay> ok, so this should be the same as in puma.yml ?
+16:31 < bigjay> sorry, puma.rb
+16:38 < bigjay> hmm, nope, something else is missing ... doesn't work even if ports are equal
+16:45 < dblessing> what do you mean it doesn't work?
+16:45 < bigjay> i mean i get nothing when a point a browser to http://<mybox>:9292
+16:47 < dblessing> firewalls? is gitlab running correctly?
+16:47 < dblessing> check logs. check that the port is actually listening. lots of things could go wrong
+16:48 < bigjay> i am on it
+18:25 < bguery> hi
+18:26 < bguery> I moved from a gitlab installation (4.2) with gitolite to 5.0, how could I update my .ssh/authorized_keys ?
+18:37 < LndGoncalves> is to remove the user's permission to apply the key?
+18:37 < LndGoncalves> admin only put the key to the user?
+18:39 < dblessing> LndGoncalves: don't believe so. really makes sense to have the user manage it because they have the keys on their box.
+18:40 < LndGoncalves> ok,
+18:41 < LndGoncalves> I asked about authentication sooner, just use the http instead of ssh
+19:59 < bigjay> dblessing: it runs with nginx - i'll try apache integration in a few days again
+19:59 < bigjay> enough for today
+19:59 < bigjay> @ll: great project - gitlab rock's! :)
+20:24 < LndGoncalves> fatal: The remote end hung up unexpectedly
+20:24 < LndGoncalves> someone already encountered this error?
+20:24 < manacit> anyone here?
+20:24 < manacit> I'm trying to move my gitlab install from /gitlab to /
+20:24 < manacit> if I set     SetEnv RAILS_RELATIVE_URL_ROOT "/gitlab/"
+20:24 < manacit> I can load it at /, but nothing loads
+20:25 < manacit> well, the text does, but javascript et all doesn't
+20:40 < dblessing> manacit: according to what you said you're trying to move from /gitlab to /, so why do you set the relative root to /gitlab?
+20:41 < manacit> Instead of /gitlab/? that sounds like a good idea! I tried moving it to / but that didn't work
+20:41 < manacit> I freely admit to being new when it comes to ruby on rails / passenger, which is why I'm having this issue!
+20:49 < dblessing> manacit: relative root would refer to where it's accessed via the web server.  so if you want to access at / then your relative root should be / also.  
+20:49 < manacit> ah
+20:50 < dblessing> but if that doesn't work then i'd have to take a look at  your configs. there's lots that could happen :) unfortunately
+20:50 < manacit> yeah! that's what I'm coming to realize
+20:50 < manacit> I'm very close, haha
+20:58 < manacit> woohoo!
+20:58 < manacit> I got it!
+21:00 < dblessing> manacit: awesome!
+21:00 < manacit> and I can see files now!
+21:00 < manacit> hooray
+21:05 < dblessing> whoo1
+21:06 < manacit> I should have just installed it myself and not used bitnami, I tried to be lazy but it ended up backfiring ;)
+21:06 < dblessing> haha that sounds interesting.  gitlab is a bit of a beast at first
+21:41 < FFForever> G'day mates.
+21:51 < notwen> code search went in today ;o
+22:08 < LndGoncalves> can someone help me with this error?
+22:08 < LndGoncalves> happens when I send several files at once pro server.
+22:09 < LndGoncalves> fatal: The remote end hung up unexpectedly
+22:09 < manacit> try sshing in to git@your.host.com and seeing what it says
+22:12 < giany> is there a way to differentiate with  different ssh-keys or password a user that has access to two projects?
+22:18 < dewdrop> Hi, I upgraded from 5 to 5.1, I get a 500. Any idea why or where I can look into for the problem?
+22:21 < manacit> check your error logs
+22:21 < manacit> apache error logs, etc
+22:43 < dewdrop> turned out to be session/cookie issue, tried on incognito browser session, works.
+22:58 < axil42> dewdrop: are you using nginx?
+23:00 < dewdrop> axil42: yes, nginx
+23:09 < axil42> https://github.com/gitlabhq/gitlabhq/pull/3863
+23:09 < axil42> check if this is your plroblem
+23:10 < axil42> otherwise try to reinstall charlock_holmes
+13:04 < bluenemo> tried to upgrade to 5 yesterday. had special characters in the wikis which broke my whole installation. had to roll back and now cant access any project via the web interface. when i click on one i get this project is empty thing (create / existent repository thing) gitlab:check works without a single error.
+13:04 < bluenemo> i'm back to 3.0.3 now using gitolite 3
+13:05 < bluenemo> + i dont get why such a serious bug (wiki migration broken) is not mentioned in the upgrade guide.. makes me a bit angry to be honest. 
+13:06 < bluenemo> when i try to create a project i get GitLab was unable to access your Gitolite system (besides viewing existing projects doesnt work). 
+14:04 < bluenemo> fixed it
+14:04 < bluenemo> (by removing tmp/gitolite*
+15:51 < chronos> Hello!
+15:51 < chronos> I have a server with gitolite installed and working also. Wanna try gitlab, but if it now works, there is way to uninstall gitlab and keep gitolite?
+16:09 < handrus> Hi! Anyone knows about a source on how to migrate from bare gitolite to the new gitlab?
+16:10 < handrus> I assume it would be just remove gitolite and import the existing repositories to gitlab... not sure
+16:24 < bguery> handrus, I did by doing a fresh installation and used rake:migrate task for the db, I then add to manually fix authorized_keys to be sure to use gitlab-shell instead of gitolite
+16:27 < handrus> got it bguery. I don't have gitlab, so I guess the rake:migrate is not needed
+19:58 < dblessing> has anyone encountered truncation with snippets?
+19:58 < dblessing> i think i just did… assuming it's the database type limitation
+20:31 < sygnous> dumb question, but where do you get debian 6.0? looks like all the damn CD images are upgrade to 7 and 6 was removed.... <-- debian noob
+20:38 < dblessing> sygnous: http://cdimage.debian.org/cdimage/archive/
+20:39 < sygnous> ahh, nice... thanks
+20:56 < axil42> sygnous: gitlab installs better on wheezy, if that's why you are looking for squezze
+20:57 < sygnous> axil42: looking at mysql clustering... 6.0 is the supported deb version
+20:58 < sygnous> was a staunch fedora / rhel fan, but have been moving towards ubuntu / debian... liking it ;)
+01:01 < axil42> sygnous: I have successfuly deployed it on debian 7 with same instructions
+03:11 < slide23> I just installed 5.1-stable, and I'm fairly sure I followed all the steps however I can't push anything.
+03:11 < slide23> any recommendations on what to look for?
+03:12 < slide23> ill rerun the check again see if that turns up anything
+03:13 < slide23> only thing it complains about is an out of date init script (even though i used curl to grab the newest one via the install file)
+03:32 < slide23> oh hrm, weird, its all of a suddently working... wtf lol
+19:38 < j1mc> hi all - when I do a final check of my newly installed gitlab instance, and am getting this message: "Init script up-to-date? ... no"
+19:39 < j1mc> I'm following the up-to-date instructions, though.
+19:40 < j1mc> any tips?
+19:42 < j1mc> i'm running this on debian 7
+20:15 < j1mc> ok - looks like i fixed it. used: sudo curl --output /etc/init.d/gitlab https://raw.github.com/gitlabhq/gitlab-recipes/5-1-stable/init.d/gitlab
+20:22 < j1mc> specifying 5-1-stable in the url seemed to fix it
+05:14 < dsup> Hi
+05:14 < dsup> Any idea what is causing this error? https://ezcrypt.it/6s6n#3NfHcXM01ayjUezgAyk0IvKE
+05:15 < dsup> gitlab will not start, running 5.0
+12:25 < asyd> hello guys! first thanks for this wonderful tools!
+12:26 < asyd> I'm trying to setup SAML authentication, I added the provider to the gem, configure it in gitlab.yml and devise.rb
+12:26 < asyd> but I guess there are somethrings wrong with routes
+12:27 < asyd> ActionController::RoutingError (No route matches [GET] "/assets/authbuttons/saml_32.png"):
+12:27 < asyd> for example
+12:27 < asyd> and got error 500 when hitting /users/auth/saml
+16:27 < sygnous> java is such a mess on os x
+20:03 < StR> hi again :D
+20:04 < StR> I'm having problems installing gitlab, I get the following error message trying to bundle install it
+20:04 < StR> I get:   /home/gitlab/gitlab/Gemfile:14: syntax error, unexpected ':', expecting $end
+06:23 < j1mc> i set up an instance of gitlab late yesterday, and i've got to say that it's great. thanks so much to all of you for your work on it.
+09:29 < hejki_> ohai, can i somehow enable --ff-only merges (running GitLab 5.1)
+09:55 < bigjay> re
+12:14 < bigjay> !seen dblessing
+12:14 < bigjay> hmm, no bot here ...
