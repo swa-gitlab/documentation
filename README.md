@@ -1,10 +1,3 @@
-# GitLab project
+# GitLab documentation repository
 
-
-## Results
-
-The following documents contain our project results:
-
-* W3. [Stakeholders](Stakeholders.md)
-* W4. [Metrics](Metrics.md)
-* W5. [Context view](ContextView.md)
+This branch is empty, content is located in the `gh-pages` branch.
