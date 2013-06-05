@@ -1,3 +1,7 @@
+---
+title: Context View
+---
+
 # GitLab Context View
 
 ## Introduction

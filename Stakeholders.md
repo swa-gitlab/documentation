@@ -1,3 +1,7 @@
+---
+title: Stakeholders
+---
+
 # GitLab Stakeholder Analysis
 
 ## Table of Contents

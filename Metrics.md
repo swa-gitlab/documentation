@@ -1,3 +1,7 @@
+---
+title: Metrics
+---
+
 # Metrics
 
 In this document we construct a variety of metrics for the GitLab project according to the [GQM (Goal Question Metric)](http://fub-taslim.googlecode.com/svn/trunk/WEMSE/INSTICC_Conference_Latex/gqm.pdf) format.
