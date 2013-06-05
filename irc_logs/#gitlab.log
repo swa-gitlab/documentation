@@ -1,0 +1,826 @@
+--- Log opened Wed May 08 13:02:49 2013
+13:02 -!- Leftb2 [~yorick@s2.nextpulse.nl] has joined #gitlab
+13:02 -!- Irssi: #gitlab: Total of 55 nicks [0 ops, 0 halfops, 0 voices, 55 normal]
+13:02 -!- Irssi: Join to #gitlab was synced in 1 secs
+13:14 -!- bluenemo [~bluenemo@unaffiliated/bluenemo] has quit [Quit: Verlassend]
+14:47 -!- lbt [~david@Maemo/community/contributor/lbt] has quit [Quit: Konversation terminated!]
+14:47 -!- lbt [~david@Maemo/community/contributor/lbt] has joined #gitlab
+14:58 -!- lbt [~david@Maemo/community/contributor/lbt] has quit [Remote host closed the connection]
+14:59 -!- lbt [~david@Maemo/community/contributor/lbt] has joined #gitlab
+15:02 -!- dblessing [~drewb@h210.236.190.173.static.ip.windstream.net] has joined #gitlab
+15:19 -!- bluenemo [~bluenemo@212.168.176.50] has joined #gitlab
+15:19 -!- bluenemo [~bluenemo@212.168.176.50] has quit [Changing host]
+15:19 -!- bluenemo [~bluenemo@unaffiliated/bluenemo] has joined #gitlab
+15:20 -!- zz_whg is now known as whg
+15:55 -!- bluenemo [~bluenemo@unaffiliated/bluenemo] has quit [Remote host closed the connection]
+16:40 -!- frdmn [~frdmn-esp@iwelt16.iwelt.de] has quit [Quit: Linkinus - http://linkinus.com]
+17:22 -!- iksik [~i@unaffiliated/iksik] has quit [Quit: Changing server]
+17:24 -!- iksik [~i@gw.livedata.pl] has joined #gitlab
+17:24 -!- iksik [~i@gw.livedata.pl] has quit [Changing host]
+17:24 -!- iksik [~i@unaffiliated/iksik] has joined #gitlab
+19:01 -!- zekefast [~zekefast@2001:470:dd95:101:8bc:b6f5:18f3:d5d] has quit [Quit: Leaving.]
+19:14 -!- Iszak [~Iszak@unaffiliated/supavisah] has quit [Quit: Textual IRC Client: www.textualapp.com]
+19:34 < FFForever> Hey hey
+19:39 -!- clone1018_ is now known as clone1018
+19:54 -!- zekefast [~zekefast@server.zekefast.org] has joined #gitlab
+20:07 -!- mcfoobar [8dc9d083@gateway/web/freenode/ip.141.201.208.131] has joined #gitlab
+20:08 < mcfoobar> Hi! Im trying to run gitlab under a sub uri with apache. I finally got it work. BUT: Some asset urls (not all)  are wrong. And even worse: the repositories can no longer be accessed, they 404.  Any ideas? I've been trying to get this working for hours.
+20:15 < dblessing> mcfoobar: https://groups.google.com/forum/#!msg/gitlabhq/mPcpq85VHew/4qupsUY90oEJ maybe that will help
+20:15 -!- dblessing [~drewb@h210.236.190.173.static.ip.windstream.net] has quit [Quit: dblessing]
+20:17 -!- dblessing [~drewb@h210.236.190.173.static.ip.windstream.net] has joined #gitlab
+20:22 < mcfoobar> dblessing: thanks for your help. sadly, that does not change anything
+20:23 < dblessing> mcfoobar: ok. can you create a new vhost and proxy directly through?
+20:24 < mcfoobar> dblessing: you mean withouth passenger?
+20:24 < dblessing> no i mean serve it up at / instead of another context
+20:25 < mcfoobar> ah okay, yes I could do that, and that works. But I want to run it at /gitlab
+20:42 -!- frdmn [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has joined #gitlab
+21:08 -!- manacit [~manacit@unaffiliated/manacit] has joined #gitlab
+21:09 < manacit> I installed gitlab via turnkey (embarrassing, I know, but it's the easiest way to get it going on AWS) - I'm just wondering what the best way to get an automated backup system is? I keep getting "Don't know how to build task 'gitlab:backup:create" - any tips. I'm probably doing it wrong!
+21:11 < dblessing> manacit: i haven't explored the backup rake task yet but we just backup the database and the repositories directory and call it good
+21:12 < manacit> do you back up the actual /home/git/, or the individual repos? 
+21:12 < manacit> pardon the questions, just want to get it right
+21:34 -!- mcfoobar [8dc9d083@gateway/web/freenode/ip.141.201.208.131] has quit [Quit: Page closed]
+22:17 < FFForever> manacit, Still having trouble?
+22:18 < manacit> I can't get gitlab:backup:create to run
+22:18 < manacit> I was thinking of just backing up /home/git and the mysqldb, but I like the idea of using the built in solution!
+22:19 < FFForever> Is there a backup task? I've croned postgres dump & tar zipped on a nightly basis for backups
+22:20 < manacit> there's supposed to be yeah
+22:21 < FFForever> How are you running it? RAILS_ENV=production rake gitlab:backup:create?
+22:21 < FFForever> I just found it.. I normally only use gitlab:check hehe
+22:21 < manacit> https://github.com/gitlabhq/gitlabhq/blob/master/doc/raketasks/backup_restore.md
+22:21 < manacit> bundle exec rake gitlab:backup:create RAILS_ENV=production
+22:22 < FFForever> SHould work. Are you running master or stable?
+22:22 < manacit> I believe stable - I just grabbed the AMI on AWS
+22:22 < manacit> which is stable - 12.0 
+22:23 < FFForever> there is no 12.0....
+22:23 < manacit> oh well
+22:24 < manacit> that's the ami version number
+22:24 < manacit> 2.2-11 (upstream archive)
+22:24  * FFForever doesn't use aws.
+22:24 < FFForever> Gitlab is currently on 5.x
+22:24 < manacit> a micro instance is free
+22:24 < manacit> yeah I realized how old that is when I checked
+22:24 < manacit> damn
+22:25 < manacit> well in that case, never mind, I'll install it myself
+22:25  * manacit mumbles something stupid about aws and ami and turnkey
+22:30 < FFForever> A micro instance is only free for 12 months :P
+22:38 < manacit> aww gitlab doesn't want to run on only 512mb of ram 
+22:38 < manacit> :(
+22:44 < FFForever> 512mb of ram is very little for a rails app.....
+23:21 < giany> anyone using a flow like dev-stage-prod? any hints regarding how can i accomplish this?
+23:32 < dblessing> giany: with regard to what? code flow? 
+23:32 < dblessing> we use feature branches for dev, develop branch for stage-ish servers, and deploy from tags for prod
+23:42 -!- trompette [~bob@punch.chezmerlet.net] has left #gitlab []
+23:44 < giany> i'm interested in code flow
+23:45 < giany> basically now I have one repo, I can commit to it and push to origin
+23:45 < giany> this repo will be the dev one
+23:45 < giany> not sure how can i move a commit to stage/prod..
+23:45 < giany> any documentation regarding this?
+23:48 < dblessing> giany: i think that's just a git workflow issue instead of a gitlab one
+23:49 < dblessing> you probably don't need to move anything so to speak…rather just tag or use branches or do something else within the same repo.  that's kind of the point of git
+23:50 < dblessing> it's not necessary to have separate repos for dev/stage/prod.  unless you really, really want to.
+23:55 < dblessing> idk if this will help or cause confusion, but git it a look anyway - http://nvie.com/posts/a-successful-git-branching-model/
+23:55 -!- dblessing [~drewb@h210.236.190.173.static.ip.windstream.net] has quit [Quit: dblessing]
+--- Day changed Thu May 09 2013
+00:55 -!- whg is now known as zz_whg
+01:14 -!- zekefast [~zekefast@server.zekefast.org] has quit [Ping timeout: 256 seconds]
+02:53 -!- realityloopAFK is now known as realityloop
+03:02 -!- dblessing [~drewb@68-189-226-69.dhcp.krny.ne.charter.com] has joined #gitlab
+03:02 -!- dblessing [~drewb@68-189-226-69.dhcp.krny.ne.charter.com] has quit [Client Quit]
+03:37 -!- zekefast [~zekefast@server.zekefast.org] has joined #gitlab
+03:58 -!- zekefast [~zekefast@server.zekefast.org] has quit [Read error: Connection timed out]
+04:00 -!- zekefast [~zekefast@server.zekefast.org] has joined #gitlab
+04:56 < manacit> speaking as someone who is unfamiliar with gitlab, is " Failed to create satellite for Administrator / Project" an error I should be particularly concerned about
+05:07 < manacit> I ran sudo -u gitlab -H bundle exec rake gitlab:satellites:create RAILS_ENV=production and it seemed to work!
+05:12 < geck> manacit: ah-hah
+05:12 < geck> thanks
+05:12 < geck> I've been hitting that with some of my stuff on miport repos
+05:12 < geck> imported repos
+05:12 < manacit> I had to make a directory
+05:13 < manacit> sudo -u gitlab -H mkdir /home/gitlab/gitlab-satellites
+05:13 < manacit> the installer doesn't make it by default
+05:14 < geck> mm
+05:14 < geck> ya, you have to do that by hand
+05:14 < geck> that may not work for me then
+05:14 < geck> I have 24 repos that work just fine
+05:14 < geck> thena  couple that I imported after the 5.0 -> 5.1 update
+05:14 < geck> that just don't work quite right
+07:50 < manacit> has anyone gone 4.0 -> 5.0
+07:50 < manacit> or should I just reinstall and go with 5.0
+07:53 < manacit> meh I might just go with bitnami !
+08:14 -!- zekefast [~zekefast@server.zekefast.org] has quit [Quit: Leaving.]
+08:23 -!- realityloop is now known as realityloopAFK
+08:29 -!- kenperkins [~textual@50-47-18-37.evrt.wa.frontiernet.net] has quit [Quit: Computer has gone to sleep.]
+09:55 -!- realityloopAFK [~realitylo@c211-28-42-116.sunsh3.vic.optusnet.com.au] has quit [Ping timeout: 245 seconds]
+09:57 -!- realityloopAFK [~realitylo@c211-28-42-116.sunsh3.vic.optusnet.com.au] has joined #gitlab
+09:57 -!- realityloopAFK is now known as realityloop
+12:18 -!- lbt [~david@Maemo/community/contributor/lbt] has quit [Remote host closed the connection]
+12:19 -!- lbt [~david@Maemo/community/contributor/lbt] has joined #gitlab
+12:28 -!- lbt [~david@Maemo/community/contributor/lbt] has quit [Excess Flood]
+12:28 -!- lbt [~david@Maemo/community/contributor/lbt] has joined #gitlab
+12:48 -!- LndGoncalves [~leonardo@200.231.112.162] has joined #gitlab
+13:30 -!- dblessing [~drewb@h210.236.190.173.static.ip.windstream.net] has joined #gitlab
+13:33 -!- zekefast [~zekefast@server.zekefast.org] has joined #gitlab
+13:58 -!- lbt [~david@Maemo/community/contributor/lbt] has quit [Remote host closed the connection]
+13:59 -!- lbt [~david@78.32.229.233] has joined #gitlab
+13:59 -!- lbt [~david@78.32.229.233] has quit [Changing host]
+13:59 -!- lbt [~david@Maemo/community/contributor/lbt] has joined #gitlab
+14:08 -!- LndGoncalves [~leonardo@200.231.112.162] has quit [Ping timeout: 260 seconds]
+14:09 -!- LndGoncalves [~leonardo@200.231.112.162] has joined #gitlab
+14:15 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+14:17 -!- Irssi: #gitlab: Total of 55 nicks [0 ops, 0 halfops, 0 voices, 55 normal]
+14:34 -!- zekefast [~zekefast@server.zekefast.org] has quit [Quit: Leaving.]
+14:37 -!- zekefast [~zekefast@server.zekefast.org] has joined #gitlab
+14:43 -!- zz_whg is now known as whg
+14:49 < LndGoncalves> hi
+14:50 < dblessing> hey LndGoncalves 
+15:02 -!- zekefast [~zekefast@server.zekefast.org] has quit [Ping timeout: 276 seconds]
+15:09 -!- zekefast [~zekefast@server.zekefast.org] has joined #gitlab
+15:20 < LndGoncalves> Guys, how do I authenticate User via password? and not just the key.
+15:20 < dblessing> LndGoncalves: via api you mean? using internal auth or LDAP?
+15:26 < LndGoncalves> umm no,
+15:26 < LndGoncalves> for a simple "git push" is needed a password.
+15:48 < LndGoncalves> dblessing, 
+15:50 < LndGoncalves> I'm using the Simple Authentication gitlab
+15:50 < LndGoncalves> but I can change if necessary.
+15:50 < LndGoncalves> what I want, and to make any changes to a push type, the user must enter a password.
+15:52 < dblessing> LndGoncalves: ah yes you must use a key.  no way around that
+16:03 -!- bigjay [~jayson@codingmonk.de] has joined #gitlab
+16:03 < bigjay> Hi
+16:04 < LndGoncalves> hi
+16:05 < bigjay> can i use gitlab without a webserver?
+16:07 < bigjay> or to put it in other words:
+16:07 < bigjay> i followed the installation guide at 
+16:07 < bigjay> https://github.com/gitlabhq/gitlabhq/blob/master/doc/install/installation.md#advanced-setup-tips
+16:08 < bigjay> to point 7
+16:08 < bigjay> but i want to use apache2 
+16:08 -!- kenperkins [~textual@50-47-18-37.evrt.wa.frontiernet.net] has joined #gitlab
+16:09 < bigjay> can anyone point me to a working howto for gitlab 5.1?
+16:15 < dblessing> bigjay: you can use apache, but you'll need something else with it.  you could do apache with passenger and run it that way, although i've never done it.  or you could still run gitlab on puma and just proxy through apache
+16:16 < dblessing> bigjay: so instead of following nginx settings for number 7, just use standard apache configuration to connect to a unix socket. must like this post talks about http://stackoverflow.com/questions/5780886/proxy-apache-load-balancers-to-a-unix-socket-instead-of-a-port
+16:17 < dblessing> bigjay: hmm never mind don't use that post.  bad example :) idk how to proxy with apache to a unix socket, or if it's possible.  alternatively, modify the puma config to run on a port instead of a socket. then you just use normal apache proxy pass 
+16:17 < bigjay> how can i check if puma is accesible?
+16:18 -!- mkrause [~mkrause@77.60.209.193] has quit [Quit: mkrause]
+16:18 < bigjay> +s
+16:18 < bigjay> in my gitlab.yml I specified a port 
+16:19 < dblessing> if you follow the directions from gitlab, it will have puma create a socket.  but if you want to hit it directly at a port you need to modify $GITLAB_HOME/config/puma.rb and comment out the unix:/ socket and uncomment the port
+16:19 < bigjay> after `/etc/service/gitlab start` shouldn't I be able to access gitlab on that port?
+16:19 < dblessing> puma doesn't listen on a port by default, with gitlab's config anyway.  it creates a unix socket
+16:20 < dblessing> you must edit puma.rb and exchange these two lines (uncomment one, comment the other)
+16:20 < dblessing> https://gist.github.com/bke-drewb/5547728
+16:20 < dblessing> reverse those...
+16:22 < dblessing> make sense?
+16:24 < bigjay> yep, and after i (re)start the gitlab service it print on the console:
+16:24 < bigjay> * Listening on tcp://0.0.0.0:9292
+16:24 < dblessing> awesome 
+16:25 < bigjay> but 
+16:25 < bigjay> lynx 0.0.0.0:9292
+16:25 < bigjay> says it could not connect
+16:25 < dblessing> well you can't do that :) 0.0.0.0 just means it's listening on all interfaces
+16:26 < bigjay> so how do I connect?
+16:26 < bigjay> localhost?
+16:26 < dblessing> yep
+16:26 < dblessing> or the box's IP address
+16:26 < dblessing> new to linux? :)
+16:26 < bigjay> LOL 
+16:27 < bigjay> nope, but we got admins for that at work - i am trying it at home - hoping to get the other devs to switch from svn to git
+16:28 < dblessing> ok haha
+16:29 < bigjay> nope, still nothing
+16:29 < bigjay> i am confused:
+16:29 < bigjay> why is there a port option in config/gitlab.yml
+16:30 < bigjay> what does it set?
+16:30 < bigjay> (a port obviously - but ??? )
+16:30 < dblessing> bigjay: i think it handles link creation and stuff like that for the web interface 
+16:30 < dblessing> so if you're not running on port 80, it needs to know so it can construct links accordingly
+16:31 < bigjay> ok, so this should be the same as in puma.yml ?
+16:31 < bigjay> sorry, puma.rb
+16:33 -!- LndGoncalves [~leonardo@200.231.112.162] has quit [Quit: Saindo]
+16:38 < bigjay> hmm, nope, something else is missing ... doesn't work even if ports are equal
+16:45 < dblessing> what do you mean it doesn't work?
+16:45 < bigjay> i mean i get nothing when a point a browser to http://<mybox>:9292
+16:47 -!- frdmn [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has quit [Remote host closed the connection]
+16:47 -!- frdmn [~frdmn-esp@209.222.18.11] has joined #gitlab
+16:47 < dblessing> firewalls? is gitlab running correctly?
+16:47 < dblessing> check logs. check that the port is actually listening. lots of things could go wrong
+16:48 < bigjay> i am on it
+17:05 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+17:25 -!- sunloverz [sunloverz@158.181.239.188] has joined #gitlab
+17:31 -!- sunloverz [sunloverz@158.181.239.188] has quit [Quit: Leaving]
+17:52 -!- mkrause [~mkrause@77.60.209.193] has quit [Quit: mkrause]
+18:01 -!- dblessing_ [~drewb@h210.236.190.173.static.ip.windstream.net] has joined #gitlab
+18:02 -!- dblessing_ [~drewb@h210.236.190.173.static.ip.windstream.net] has quit [Remote host closed the connection]
+18:02 -!- dblessing_ [~drewb@h210.236.190.173.static.ip.windstream.net] has joined #gitlab
+18:03 -!- dblessing [~drewb@h210.236.190.173.static.ip.windstream.net] has quit [Read error: Connection reset by peer]
+18:03 -!- dblessing_ is now known as dblessing
+18:13 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+18:22 -!- mkrause [~mkrause@77.60.209.193] has quit [Quit: mkrause]
+18:25 -!- bguery [~bguery@ban83-2-78-239-124-162.fbx.proxad.net] has joined #gitlab
+18:25 < bguery> hi
+18:26 < bguery> I moved from a gitlab installation (4.2) with gitolite to 5.0, how could I update my .ssh/authorized_keys ?
+18:31 -!- frdmn [~frdmn-esp@209.222.18.11] has quit [Quit: Leaving...]
+18:34 -!- frdmn [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has joined #gitlab
+18:37 -!- LndGoncalves [~leonardo@200.231.112.162] has joined #gitlab
+18:37 < LndGoncalves> is to remove the user's permission to apply the key?
+18:37 < LndGoncalves> admin only put the key to the user?
+18:39 < dblessing> LndGoncalves: don't believe so. really makes sense to have the user manage it because they have the keys on their box.
+18:40 < LndGoncalves> ok,
+18:41 < LndGoncalves> I asked about authentication sooner, just use the http instead of ssh
+19:06 -!- obli-AWAY [~abyss1@62.27.85.48] has quit [Ping timeout: 255 seconds]
+19:51 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+19:59 < bigjay> dblessing: it runs with nginx - i'll try apache integration in a few days again
+19:59 < bigjay> enough for today
+19:59 < bigjay> @ll: great project - gitlab rock's! :)
+20:24 < LndGoncalves> fatal: The remote end hung up unexpectedly
+20:24 < LndGoncalves> someone already encountered this error?
+20:24 < manacit> anyone here?
+20:24 < manacit> I'm trying to move my gitlab install from /gitlab to /
+20:24 < manacit> if I set     SetEnv RAILS_RELATIVE_URL_ROOT "/gitlab/"
+20:24 < manacit> I can load it at /, but nothing loads
+20:25 < manacit> well, the text does, but javascript et all doesn't
+20:40 < dblessing> manacit: according to what you said you're trying to move from /gitlab to /, so why do you set the relative root to /gitlab?
+20:41 < manacit> Instead of /gitlab/? that sounds like a good idea! I tried moving it to / but that didn't work
+20:41 < manacit> I freely admit to being new when it comes to ruby on rails / passenger, which is why I'm having this issue!
+20:49 < dblessing> manacit: relative root would refer to where it's accessed via the web server.  so if you want to access at / then your relative root should be / also.  
+20:49 < manacit> ah
+20:50 < dblessing> but if that doesn't work then i'd have to take a look at  your configs. there's lots that could happen :) unfortunately
+20:50 < manacit> yeah! that's what I'm coming to realize
+20:50 < manacit> I'm very close, haha
+20:58 < manacit> woohoo!
+20:58 < manacit> I got it!
+21:00 < dblessing> manacit: awesome!
+21:00 < manacit> and I can see files now!
+21:00 < manacit> hooray
+21:05 < dblessing> whoo1
+21:06 < manacit> I should have just installed it myself and not used bitnami, I tried to be lazy but it ended up backfiring ;)
+21:06 < dblessing> haha that sounds interesting.  gitlab is a bit of a beast at first
+21:07 -!- klaernie [~kandre@mainframe.ak-online.be] has quit [Quit: leaving]
+21:07 -!- klaernie [~kandre@mainframe.ak-online.be] has joined #gitlab
+21:09 -!- klaernie [~kandre@mainframe.ak-online.be] has quit [Client Quit]
+21:10 -!- klaernie [~kandre@mainframe.ak-online.be] has joined #gitlab
+21:13 -!- klaernie [~kandre@mainframe.ak-online.be] has quit [Client Quit]
+21:14 -!- klaernie [~kandre@mainframe.ak-online.be] has joined #gitlab
+21:41 < FFForever> G'day mates.
+21:51 < notwen> code search went in today ;o
+21:55 -!- dblessing [~drewb@h210.236.190.173.static.ip.windstream.net] has quit [Quit: dblessing]
+22:08 < LndGoncalves> can someone help me with this error?
+22:08 < LndGoncalves> happens when I send several files at once pro server.
+22:09 < LndGoncalves> fatal: The remote end hung up unexpectedly
+22:09 < manacit> try sshing in to git@your.host.com and seeing what it says
+22:12 < giany> is there a way to differentiate with  different ssh-keys or password a user that has access to two projects?
+22:17 -!- dewdrop [~dewdrop@unaffiliated/dewdrop] has joined #gitlab
+22:18 < dewdrop> Hi, I upgraded from 5 to 5.1, I get a 500. Any idea why or where I can look into for the problem?
+22:20 -!- zekefast [~zekefast@server.zekefast.org] has quit [Quit: Leaving.]
+22:21 < manacit> check your error logs
+22:21 < manacit> apache error logs, etc
+22:32 -!- axil42 [~axil42@snf-18326.vm.okeanos.grnet.gr] has quit [Quit: WeeChat 0.4.0]
+22:33 -!- mkrause [~mkrause@77.60.209.193] has quit [Quit: mkrause]
+22:43 < dewdrop> turned out to be session/cookie issue, tried on incognito browser session, works.
+22:46 -!- w32stuxnet [~w32stuxne@14-202-71-241.static.tpgi.com.au] has quit [Ping timeout: 260 seconds]
+22:48 -!- w32stuxnet [~w32stuxne@14-202-71-241.static.tpgi.com.au] has joined #gitlab
+22:51 -!- LndGoncalves [~leonardo@200.231.112.162] has quit [Quit: Saindo]
+22:57 -!- axil42 [~axil42@snf-18326.vm.okeanos.grnet.gr] has joined #gitlab
+22:58 < axil42> dewdrop: are you using nginx?
+23:00 < dewdrop> axil42: yes, nginx
+23:04 -!- whg is now known as zz_whg
+23:09 < axil42> https://github.com/gitlabhq/gitlabhq/pull/3863
+23:09 < axil42> check if this is your plroblem
+23:10 < axil42> otherwise try to reinstall charlock_holmes
+--- Day changed Fri May 10 2013
+02:48 -!- tmcmahon [~Thunderbi@wl64-130.lcom.net] has joined #gitlab
+03:33 -!- tmcmahon [~Thunderbi@wl64-130.lcom.net] has quit [Quit: tmcmahon]
+07:33 -!- frdmn [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has quit [Quit: Linkinus - http://linkinus.com]
+08:13 -!- frdmn [~frdmn-esp@iwelt16.iwelt.de] has joined #gitlab
+08:16 -!- realityloop is now known as realityloopAFK
+08:36 -!- realityloopAFK is now known as realityloop
+08:37 -!- realityloop is now known as realityloopAFK
+08:53 -!- w32stuxnet [~w32stuxne@14-202-71-241.static.tpgi.com.au] has quit [Quit: w32stuxnet]
+10:41 -!- rom1504_ [~rom1504@rom1504.fr] has joined #gitlab
+10:46 -!- Netsplit *.net <-> *.split quits: rom1504, FFForever
+10:47 -!- Netsplit over, joins: FFForever
+10:57 -!- Chr1831 [~FFForever@198.98.53.36] has joined #gitlab
+10:59 -!- Netsplit *.net <-> *.split quits: FFForever
+11:14 -!- busker [~lance@trevis.xen.prgmr.com] has joined #gitlab
+11:15 -!- giany_ [~giany@shifu.x83.org] has joined #gitlab
+11:21 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has joined #gitlab
+11:21 -!- samael [~earendil@multivac.valis-e.com] has quit [Ping timeout: 264 seconds]
+11:21 -!- giany [~giany@shifu.x83.org] has quit [Ping timeout: 264 seconds]
+11:21 -!- busker_ [~lance@trevis.xen.prgmr.com] has quit [Ping timeout: 264 seconds]
+11:40 -!- samael [~earendil@multivac.valis-e.com] has joined #gitlab
+12:13 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has quit [Read error: Connection reset by peer]
+12:13 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has joined #gitlab
+12:31 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+12:53 -!- zekefast [~zekefast@2001:470:dd95:101:8bc:b6f5:18f3:d5d] has joined #gitlab
+13:02 -!- bluenemo [~bluenemo@unaffiliated/bluenemo] has joined #gitlab
+13:04 < bluenemo> tried to upgrade to 5 yesterday. had special characters in the wikis which broke my whole installation. had to roll back and now cant access any project via the web interface. when i click on one i get this project is empty thing (create / existent repository thing) gitlab:check works without a single error.
+13:04 < bluenemo> i'm back to 3.0.3 now using gitolite 3
+13:05 < bluenemo> + i dont get why such a serious bug (wiki migration broken) is not mentioned in the upgrade guide.. makes me a bit angry to be honest. 
+13:06 < bluenemo> when i try to create a project i get GitLab was unable to access your Gitolite system (besides viewing existing projects doesnt work). 
+13:07 -!- mkrause [~mkrause@77.60.209.193] has quit [Quit: mkrause]
+13:18 -!- giany_ is now known as giany
+14:04 < bluenemo> fixed it
+14:04 < bluenemo> (by removing tmp/gitolite*
+14:09 -!- bluenemo [~bluenemo@unaffiliated/bluenemo] has quit [Quit: Verlassend]
+14:22 -!- dblessing [~drewb@h210.236.190.173.static.ip.windstream.net] has joined #gitlab
+14:54 -!- tmcmahon [~Thunderbi@wl64-130.lcom.net] has joined #gitlab
+15:00 -!- tmcmahon [~Thunderbi@wl64-130.lcom.net] has quit [Quit: tmcmahon]
+15:04 -!- zz_whg is now known as whg
+15:13 -!- frdmn [~frdmn-esp@iwelt16.iwelt.de] has quit [Quit: Linkinus - http://linkinus.com]
+15:13 -!- Iszak [~Iszak@unaffiliated/supavisah] has joined #gitlab
+15:50 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has quit [Quit: Jippi]
+15:50 -!- chronos [~quassel@unaffiliated/chronos] has joined #gitlab
+15:51 < chronos> Hello!
+15:51 < chronos> I have a server with gitolite installed and working also. Wanna try gitlab, but if it now works, there is way to uninstall gitlab and keep gitolite?
+15:54 -!- sygnous [~sygnous@unaffiliated/malikeye] has quit [Remote host closed the connection]
+15:55 -!- sygnous [~sygnous@unaffiliated/malikeye] has joined #gitlab
+16:06 -!- handrus [bb130f22@gateway/web/freenode/ip.187.19.15.34] has joined #gitlab
+16:09 < handrus> Hi! Anyone knows about a source on how to migrate from bare gitolite to the new gitlab?
+16:10 < handrus> I assume it would be just remove gitolite and import the existing repositories to gitlab... not sure
+16:24 < bguery> handrus, I did by doing a fresh installation and used rake:migrate task for the db, I then add to manually fix authorized_keys to be sure to use gitlab-shell instead of gitolite
+16:27 < handrus> got it bguery. I don't have gitlab, so I guess the rake:migrate is not needed
+16:50 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has joined #gitlab
+16:58 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has quit [Ping timeout: 252 seconds]
+17:23 -!- handrus [bb130f22@gateway/web/freenode/ip.187.19.15.34] has quit [Quit: Page closed]
+17:24 -!- realityloopAFK [~realitylo@c211-28-42-116.sunsh3.vic.optusnet.com.au] has quit [Ping timeout: 264 seconds]
+17:29 -!- realityloopAFK [~realitylo@c211-28-42-116.sunsh3.vic.optusnet.com.au] has joined #gitlab
+17:29 -!- realityloopAFK is now known as realityloop
+17:45 -!- tmcmahon [~Thunderbi@wl64-130.lcom.net] has joined #gitlab
+17:52 -!- tmcmahon [~Thunderbi@wl64-130.lcom.net] has quit [Quit: tmcmahon]
+17:55 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has joined #gitlab
+17:59 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has quit [Ping timeout: 252 seconds]
+18:22 -!- Iszak [~Iszak@unaffiliated/supavisah] has quit [Quit: Textual IRC Client: www.textualapp.com]
+18:45 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has joined #gitlab
+18:57 -!- frdmn [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has joined #gitlab
+19:58 < dblessing> has anyone encountered truncation with snippets?
+19:58 < dblessing> i think i just did… assuming it's the database type limitation
+20:13 -!- whg is now known as zz_whg
+20:31 < sygnous> dumb question, but where do you get debian 6.0? looks like all the damn CD images are upgrade to 7 and 6 was removed.... <-- debian noob
+20:38 < dblessing> sygnous: http://cdimage.debian.org/cdimage/archive/
+20:39 < sygnous> ahh, nice... thanks
+20:56 -!- bguery [~bguery@ban83-2-78-239-124-162.fbx.proxad.net] has quit [Ping timeout: 268 seconds]
+20:56 < axil42> sygnous: gitlab installs better on wheezy, if that's why you are looking for squezze
+20:57 < sygnous> axil42: looking at mysql clustering... 6.0 is the supported deb version
+20:58 < sygnous> was a staunch fedora / rhel fan, but have been moving towards ubuntu / debian... liking it ;)
+20:58 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has quit [Quit: Jippi]
+21:09 -!- zekefast [~zekefast@2001:470:dd95:101:8bc:b6f5:18f3:d5d] has quit [Quit: Leaving.]
+21:37 -!- zz_whg is now known as whg
+22:06 -!- Chr1831 is now known as FFForever
+22:06 -!- FFForever [~FFForever@198.98.53.36] has quit [Changing host]
+22:06 -!- FFForever [~FFForever@unaffiliated/ffforever] has joined #gitlab
+22:55 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+22:59 -!- mkrause [~mkrause@77.60.209.193] has quit [Quit: mkrause]
+23:03 -!- zekefast [~zekefast@server.zekefast.org] has joined #gitlab
+23:09 -!- whg is now known as zz_whg
+23:46 -!- dblessing [~drewb@h210.236.190.173.static.ip.windstream.net] has quit [Quit: dblessing]
+--- Day changed Sat May 11 2013
+00:44 -!- zekefast [~zekefast@server.zekefast.org] has quit [Read error: Connection timed out]
+00:58 -!- halfdan- [~halfdan@thor.geekproject.eu] has quit [Quit: Lost terminal]
+01:01 < axil42> sygnous: I have successfuly deployed it on debian 7 with same instructions
+01:07 -!- stephenl [~stephen@ec2-54-235-223-231.compute-1.amazonaws.com] has quit [Ping timeout: 256 seconds]
+01:08 -!- harleypig [~harleypig@harleypig.com] has left #gitlab []
+01:09 -!- axil42 [~axil42@snf-18326.vm.okeanos.grnet.gr] has quit [Quit: WeeChat 0.4.0]
+02:26 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has joined #gitlab
+02:27 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has quit [Client Quit]
+02:27 -!- karamorf [~duff@199.181.135.135] has quit [Quit: Lost terminal]
+03:06 -!- iksik_ [~i@gw.livedata.pl] has joined #gitlab
+03:08 -!- SomeoneWeird [~SomeoneWe@unaffiliated/someoneweird] has quit [Ping timeout: 245 seconds]
+03:08 -!- iksik [~i@unaffiliated/iksik] has quit [Ping timeout: 245 seconds]
+03:08 -!- dewdrop [~dewdrop@unaffiliated/dewdrop] has quit [Ping timeout: 245 seconds]
+03:09 -!- SomeoneWeird [~SomeoneWe@ec2-122-248-235-44.ap-southeast-1.compute.amazonaws.com] has joined #gitlab
+03:09 -!- SomeoneWeird is now known as Guest13085
+03:09 -!- dewdrop [~dewdrop@2604:180::84d6:b1da] has joined #gitlab
+03:09 -!- dewdrop [~dewdrop@2604:180::84d6:b1da] has quit [Changing host]
+03:09 -!- dewdrop [~dewdrop@unaffiliated/dewdrop] has joined #gitlab
+03:10 -!- slide23 [~slide@unaffiliated/slide] has joined #gitlab
+03:11 < slide23> I just installed 5.1-stable, and I'm fairly sure I followed all the steps however I can't push anything.
+03:11 < slide23> any recommendations on what to look for?
+03:12 < slide23> ill rerun the check again see if that turns up anything
+03:13 -!- giany_ [~giany@shifu.x83.org] has joined #gitlab
+03:13 -!- Netsplit *.net <-> *.split quits: MetaCosm, giany
+03:13 < slide23> only thing it complains about is an out of date init script (even though i used curl to grab the newest one via the install file)
+03:20 -!- Netsplit over, joins: MetaCosm
+03:24 -!- sbbodhtimrj [mith@vpn.home.jrbobdobbs.org] has joined #gitlab
+03:25 -!- jakedahn_ [~jakedahn@2001:4800:7810:512:24e6:44b4:ff04:9e19] has joined #gitlab
+03:27 -!- jakedahn [~jakedahn@unaffiliated/jakedahn] has quit [Ping timeout: 245 seconds]
+03:27 -!- jakedahn_ is now known as jakedahn
+03:27 -!- jrmithdobbs [mith@vpn.home.jrbobdobbs.org] has quit [Ping timeout: 245 seconds]
+03:27 -!- sbbodhtimrj is now known as jrmithdobbs
+03:32 < slide23> oh hrm, weird, its all of a suddently working... wtf lol
+03:32 -!- Ancient [~ancient@us.whatbox.ca] has quit [Ping timeout: 276 seconds]
+03:32 -!- Ancient [~ancient@us.whatbox.ca] has joined #gitlab
+03:32 -!- Guest13085 [~SomeoneWe@ec2-122-248-235-44.ap-southeast-1.compute.amazonaws.com] has quit [Ping timeout: 245 seconds]
+03:34 -!- jakedahn [~jakedahn@2001:4800:7810:512:24e6:44b4:ff04:9e19] has quit [Ping timeout: 245 seconds]
+--- Log closed Sat May 11 03:40:14 2013
+--- Log opened Sat May 11 03:45:42 2013
+03:45 -!- Leftb2 [~yorick@s2.nextpulse.nl] has joined #gitlab
+03:45 -!- Irssi: #gitlab: Total of 48 nicks [0 ops, 0 halfops, 0 voices, 48 normal]
+03:45 -!- Irssi: Join to #gitlab was synced in 8 secs
+03:51 -!- xx4h [~xx4h@178-26-108-48-dynip.superkabel.de] has joined #gitlab
+03:56 -!- tmcmahon [~Thunderbi@wl64-130.lcom.net] has quit [Quit: tmcmahon]
+03:56 -!- Netsplit *.net <-> *.split quits: sygnous, xx4h_
+03:57 -!- Netsplit over, joins: sygnous
+03:58 -!- dewdrop [~dewdrop@unaffiliated/dewdrop] has quit [Ping timeout: 245 seconds]
+03:58 -!- derf- [derf@2600:3c03::f03c:91ff:feae:f3e3] has quit [Ping timeout: 245 seconds]
+03:59 -!- dewdrop_ [~dewdrop@2604:180::84d6:b1da] has joined #gitlab
+03:59 -!- dewdrop_ [~dewdrop@2604:180::84d6:b1da] has quit [Changing host]
+03:59 -!- dewdrop_ [~dewdrop@unaffiliated/dewdrop] has joined #gitlab
+03:59 -!- derf- [derf@2600:3c03::f03c:91ff:feae:f3e3] has joined #gitlab
+04:00 -!- cowmix [~cowmix@soy.indirect.com] has joined #gitlab
+04:02 -!- MetaCosm_ [~MetaCosm@unaffiliated/metacosm] has joined #gitlab
+04:03 -!- SomeoneWeird [~SomeoneWe@ec2-122-248-235-44.ap-southeast-1.compute.amazonaws.com] has joined #gitlab
+04:03 -!- Netsplit *.net <-> *.split quits: SomeoneWeird_, cowmix_, MetaCosm
+04:03 -!- SomeoneWeird is now known as Guest6243
+04:05 -!- bigjay_ [~jayson@codingmonk.de] has joined #gitlab
+04:09 -!- bigjay [~jayson@codingmonk.de] has quit [Ping timeout: 245 seconds]
+04:11 -!- Netsplit *.net <-> *.split quits: jakedahn, samael
+04:14 -!- Guest6243 [~SomeoneWe@ec2-122-248-235-44.ap-southeast-1.compute.amazonaws.com] has quit [Changing host]
+04:14 -!- Guest6243 [~SomeoneWe@unaffiliated/someoneweird] has joined #gitlab
+04:15 -!- Guest6243 is now known as SomeoneWierd
+04:15 -!- SomeoneWierd is now known as SomeoneWeird
+04:15 -!- Netsplit over, joins: jakedahn, samael
+04:17 -!- derf-- [derf@2600:3c03::f03c:91ff:feae:f3e3] has joined #gitlab
+04:18 -!- dewdrop [~dewdrop@2604:180::84d6:b1da] has joined #gitlab
+04:18 -!- dewdrop [~dewdrop@2604:180::84d6:b1da] has quit [Changing host]
+04:18 -!- dewdrop [~dewdrop@unaffiliated/dewdrop] has joined #gitlab
+04:19 -!- Netsplit *.net <-> *.split quits: dewdrop_, derf-
+04:19 -!- derf-- is now known as derf-
+04:20 -!- frd|afk [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has joined #gitlab
+04:23 -!- giany_ [~giany@shifu.x83.org] has joined #gitlab
+04:24 -!- cowmix_ [~cowmix@soy.indirect.com] has joined #gitlab
+04:26 -!- Netsplit *.net <-> *.split quits: frdmn, cowmix, bigjay_, giany
+04:29 -!- rom1504_ is now known as rom1504
+04:29 -!- bigjay [~jayson@codingmonk.de] has joined #gitlab
+04:38 -!- xx4h_ [~xx4h@178-26-108-48-dynip.superkabel.de] has joined #gitlab
+04:38 -!- bigjay_ [~jayson@codingmonk.de] has joined #gitlab
+04:43 -!- jakedahn_ [~jakedahn@2001:4800:7810:512:24e6:44b4:ff04:9e19] has joined #gitlab
+04:44 -!- SomeoneWeird_ [~SomeoneWe@ec2-122-248-235-44.ap-southeast-1.compute.amazonaws.com] has joined #gitlab
+04:44 -!- bigjay [~jayson@codingmonk.de] has quit [Ping timeout: 268 seconds]
+04:44 -!- xx4h [~xx4h@178-26-108-48-dynip.superkabel.de] has quit [Ping timeout: 268 seconds]
+04:44 -!- SomeoneWeird [~SomeoneWe@unaffiliated/someoneweird] has quit [Ping timeout: 268 seconds]
+04:46 -!- jakedahn [~jakedahn@2001:4800:7810:512:24e6:44b4:ff04:9e19] has quit [Ping timeout: 264 seconds]
+04:46 -!- jakedahn_ is now known as jakedahn
+04:53 -!- Netsplit *.net <-> *.split quits: geck, frd|afk, jrmithdobbs, alexanderte, zz_whg, beatpanic, kamiyuki, sygnous, lbt, dewdrop,  (+34 more, use /NETSPLIT to show all of them)
+04:53 -!- notwen_ [james@unaffiliated/sindacious] has quit [Read error: Operation timed out]
+04:54 -!- iksik [~i@unaffiliated/iksik] has quit [Read error: Operation timed out]
+05:00 -!- iksik_ [~i@gw.livedata.pl] has joined #gitlab
+05:00 -!- notwen [james@unaffiliated/sindacious] has joined #gitlab
+05:00 -!- Netsplit over, joins: SomeoneWeird_, jakedahn, bigjay_, xx4h_, cowmix_, giany_, frd|afk, dewdrop, derf-, samael (+34 more)
+05:08 -!- zz_whg is now known as whg
+05:32 -!- whg is now known as zz_whg
+05:45 -!- rjgonza [uid2292@gateway/web/irccloud.com/x-uwyskfqssvpotovl] has joined #gitlab
+06:28 -!- SomeoneWeird_ [~SomeoneWe@ec2-122-248-235-44.ap-southeast-1.compute.amazonaws.com] has quit [Changing host]
+06:28 -!- SomeoneWeird_ [~SomeoneWe@unaffiliated/someoneweird] has joined #gitlab
+06:28 -!- SomeoneWeird_ is now known as SomeoneWeird
+08:45 -!- axil42 [~axil42@snf-18326.vm.okeanos.grnet.gr] has joined #gitlab
+11:04 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has joined #gitlab
+11:04 -!- busker [~lance@trevis.xen.prgmr.com] has quit [Remote host closed the connection]
+12:26 -!- MatToufoutu [~MaT@unaffiliated/mattoufoutu] has joined #gitlab
+12:27 -!- GeorgeJ [~quassel@unaffiliated/georgej] has joined #gitlab
+12:53 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+12:53 -!- mkrause [~mkrause@77.60.209.193] has left #gitlab []
+13:06 -!- GeorgeJ [~quassel@unaffiliated/georgej] has quit [Remote host closed the connection]
+13:14 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+15:08 -!- MatToufoutu [~MaT@unaffiliated/mattoufoutu] has quit [Quit: Quitte]
+15:32 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has quit [Quit: Jippi]
+15:53 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has joined #gitlab
+16:46 -!- frdmn [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has joined #gitlab
+16:49 -!- frd|afk [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has quit [Ping timeout: 264 seconds]
+17:20 -!- frd|afk [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has joined #gitlab
+17:24 -!- dewdrop_ [~dewdrop@2604:180::84d6:b1da] has joined #gitlab
+17:24 -!- dewdrop_ [~dewdrop@2604:180::84d6:b1da] has quit [Changing host]
+17:24 -!- dewdrop_ [~dewdrop@unaffiliated/dewdrop] has joined #gitlab
+17:27 -!- dewdrop [~dewdrop@unaffiliated/dewdrop] has quit [Ping timeout: 245 seconds]
+17:30 -!- Netsplit *.net <-> *.split quits: frdmn
+18:13 -!- mkrause [~mkrause@77.60.209.193] has quit [Quit: mkrause]
+18:16 -!- jakedahn [~jakedahn@2001:4800:7810:512:24e6:44b4:ff04:9e19] has quit [Ping timeout: 245 seconds]
+18:17 -!- jakedahn [~jakedahn@2001:4800:7810:512:24e6:44b4:ff04:9e19] has joined #gitlab
+18:17 -!- cowmix_ [~cowmix@soy.indirect.com] has quit [Ping timeout: 245 seconds]
+18:19 -!- xx4h_ [~xx4h@178-26-108-48-dynip.superkabel.de] has quit [Ping timeout: 245 seconds]
+18:19 -!- cowmix [~cowmix@soy.indirect.com] has joined #gitlab
+18:20 -!- xx4h [~xx4h@178-26-108-48-dynip.superkabel.de] has joined #gitlab
+18:27 -!- dewdrop_ [~dewdrop@unaffiliated/dewdrop] has quit [Read error: Connection reset by peer]
+18:27 -!- dewdrop [~dewdrop@2604:180::84d6:b1da] has joined #gitlab
+18:27 -!- dewdrop [~dewdrop@2604:180::84d6:b1da] has quit [Changing host]
+18:27 -!- dewdrop [~dewdrop@unaffiliated/dewdrop] has joined #gitlab
+18:28 -!- Netsplit *.net <-> *.split quits: derf-, samael
+18:29 -!- Netsplit over, joins: derf-, samael
+18:29 -!- samael [~earendil@multivac.valis-e.com] has quit [Remote host closed the connection]
+18:31 -!- samael [~earendil@multivac.valis-e.com] has joined #gitlab
+18:39 -!- lbt_ [~david@Maemo/community/contributor/lbt] has joined #gitlab
+18:39 -!- realityloopAFK [~realitylo@c211-28-42-116.sunsh3.vic.optusnet.com.au] has joined #gitlab
+18:40 -!- lbt [~david@Maemo/community/contributor/lbt] has quit [Excess Flood]
+18:40 -!- realityloop [~realitylo@c211-28-42-116.sunsh3.vic.optusnet.com.au] has quit [Ping timeout: 256 seconds]
+18:41 -!- realityloopAFK is now known as realityloop
+19:01 -!- giany [~giany@shifu.x83.org] has joined #gitlab
+19:04 -!- rom1504_ [~rom1504@rom1504.fr] has joined #gitlab
+19:07 -!- Netsplit *.net <-> *.split quits: axil42, giany_, rom1504, rjgonza
+19:14 -!- Netsplit over, joins: axil42
+19:35 -!- frdmn [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has joined #gitlab
+19:36 -!- j1mc [uid7188@gateway/web/irccloud.com/x-fudoxieqiilivesc] has joined #gitlab
+19:38 -!- lbt_away [~david@78.32.229.233] has joined #gitlab
+19:38 -!- lbt_away [~david@78.32.229.233] has quit [Changing host]
+19:38 -!- lbt_away [~david@Maemo/community/contributor/lbt] has joined #gitlab
+19:38 < j1mc> hi all - when I do a final check of my newly installed gitlab instance, and am getting this message: "Init script up-to-date? ... no"
+19:39 < j1mc> I'm following the up-to-date instructions, though.
+19:40 < j1mc> any tips?
+19:41 -!- frd|afk [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has quit [Ping timeout: 268 seconds]
+19:41 -!- lbt_ [~david@Maemo/community/contributor/lbt] has quit [Ping timeout: 268 seconds]
+19:42 < j1mc> i'm running this on debian 7
+19:51 -!- Netsplit *.net <-> *.split quits: Jippi
+19:57 -!- Netsplit over, joins: Jippi
+20:10 -!- qknight_ [~joachim@176.9.99.117] has joined #gitlab
+20:14 -!- Netsplit *.net <-> *.split quits: Estel, bigjay_, chronos, iksik_, sygnous, frdmn, MetaCosm_, teegee543, klaernie, Jippi,  (+11 more, use /NETSPLIT to show all of them)
+20:15 < j1mc> ok - looks like i fixed it. used: sudo curl --output /etc/init.d/gitlab https://raw.github.com/gitlabhq/gitlab-recipes/5-1-stable/init.d/gitlab
+20:16 -!- FFForever [~FFForever@198.98.53.36] has joined #gitlab
+20:21 -!- manacit [~manacit@i.love.facepwn.com] has joined #gitlab
+20:22 < j1mc> specifying 5-1-stable in the url seemed to fix it
+20:31 -!- chronos [~quassel@unaffiliated/chronos] has joined #gitlab
+20:31 -!- frdmn [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has joined #gitlab
+20:31 -!- bigjay_ [~jayson@codingmonk.de] has joined #gitlab
+20:31 -!- MetaCosm_ [~MetaCosm@unaffiliated/metacosm] has joined #gitlab
+20:31 -!- sygnous [~sygnous@unaffiliated/malikeye] has joined #gitlab
+20:33 -!- realityloop [~realitylo@c211-28-42-116.sunsh3.vic.optusnet.com.au] has joined #gitlab
+20:33 -!- cowmix [~cowmix@soy.indirect.com] has joined #gitlab
+20:33 -!- iksik_ [~i@gw.livedata.pl] has joined #gitlab
+20:33 -!- marcqualie [~marcquali@irc.marcqualie.com] has joined #gitlab
+20:33 -!- teegee543 [~teegee543@sealion.richardpeng.com] has joined #gitlab
+20:33 -!- zz_whg [whg@unaffiliated/whg] has joined #gitlab
+20:33 -!- cowmix [~cowmix@soy.indirect.com] has quit [Excess Flood]
+20:35 -!- cowmix [~cowmix@soy.indirect.com] has joined #gitlab
+20:36 -!- Ancient [~ancient@2604:9a00:2100:a001:1::] has joined #gitlab
+20:36 -!- klaernie [~kandre@mainframe.ak-online.be] has joined #gitlab
+20:36 -!- andredieb [~andredieb@unaffiliated/andredieb] has joined #gitlab
+20:36 -!- semiosis [~semiosis@z.peircean.com] has joined #gitlab
+20:36 -!- beatpanic [kpanic@ns3002522.ovh.net] has joined #gitlab
+20:36 -!- Estel [~Estel@compsoc.sunion.warwick.ac.uk] has joined #gitlab
+20:36 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has joined #gitlab
+20:37 -!- manacit [~manacit@i.love.facepwn.com] has quit [Quit: ZNC - http://znc.in]
+20:44 -!- Netsplit *.net <-> *.split quits: chronos, sygnous, frdmn, bigjay_, MetaCosm_
+20:49 -!- manacit [~manacit@unaffiliated/manacit] has joined #gitlab
+20:50 -!- Netsplit over, joins: chronos, frdmn, bigjay_, MetaCosm_, sygnous
+20:50 -!- zz_whg [whg@unaffiliated/whg] has quit [Changing host]
+20:50 -!- zz_whg [whg@nat/ibm/x-kyqyvjswtdyywrws] has joined #gitlab
+20:51 -!- FFForever [~FFForever@198.98.53.36] has quit [Changing host]
+20:51 -!- FFForever [~FFForever@unaffiliated/ffforever] has joined #gitlab
+20:52 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+20:59 -!- manacit [~manacit@unaffiliated/manacit] has quit [Ping timeout: 255 seconds]
+21:13 -!- rjgonza [uid2292@gateway/web/irccloud.com/session] has joined #gitlab
+21:34 -!- manacit [~manacit@i.love.facepwn.com] has joined #gitlab
+21:48 -!- klaernie [~kandre@mainframe.ak-online.be] has quit [Ping timeout: 252 seconds]
+21:50 -!- klaernie [~kandre@mainframe.ak-online.be] has joined #gitlab
+22:18 -!- qknight_ [~joachim@176.9.99.117] has quit [Quit: leaving]
+22:24 -!- sygnous_ [~sygnous@ec2-54-236-218-74.compute-1.amazonaws.com] has joined #gitlab
+22:27 -!- MetaCosm [~MetaCosm@li247-27.members.linode.com] has joined #gitlab
+22:30 -!- sygnous [~sygnous@unaffiliated/malikeye] has quit [Ping timeout: 276 seconds]
+22:31 -!- MetaCosm_ [~MetaCosm@unaffiliated/metacosm] has quit [Excess Flood]
+22:31 -!- chronos [~quassel@unaffiliated/chronos] has quit [Read error: Connection reset by peer]
+22:42 -!- bigjay [~jayson@codingmonk.de] has joined #gitlab
+22:42 -!- Netsplit *.net <-> *.split quits: frdmn, bigjay_
+23:01 -!- Netsplit over, joins: frdmn
+23:18 -!- lbt_away [~david@Maemo/community/contributor/lbt] has quit [Excess Flood]
+23:19 -!- lbt_away [~david@78.32.229.233] has joined #gitlab
+23:22 -!- dewdrop_ [~dewdrop@2604:180::84d6:b1da] has joined #gitlab
+23:24 -!- Netsplit *.net <-> *.split quits: axil42, dewdrop
+23:25 -!- rom1504_ [~rom1504@rom1504.fr] has quit [Ping timeout: 264 seconds]
+23:26 -!- rom1504 [~rom1504@rom1504.fr] has joined #gitlab
+23:27 -!- rjgonza [uid2292@gateway/web/irccloud.com/session] has quit [Changing host]
+23:27 -!- rjgonza [uid2292@gateway/web/irccloud.com/x-kkrceppzaybmijla] has joined #gitlab
+23:27 -!- mkrause [~mkrause@77.60.209.193] has quit [Quit: mkrause]
+23:30 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+23:31 -!- mkrause [~mkrause@77.60.209.193] has quit [Client Quit]
+--- Day changed Sun May 12 2013
+00:08 -!- manacit [~manacit@i.love.facepwn.com] has quit [Changing host]
+00:08 -!- manacit [~manacit@unaffiliated/manacit] has joined #gitlab
+00:08 -!- MetaCosm [~MetaCosm@li247-27.members.linode.com] has quit [Changing host]
+00:08 -!- MetaCosm [~MetaCosm@unaffiliated/metacosm] has joined #gitlab
+00:08 -!- clone1018_ [quasselcor@freq.in] has joined #gitlab
+00:10 -!- Netsplit *.net <-> *.split quits: DanKnox, clone1018
+00:10 -!- DanKnox_ [~DanKnox@dev.threedotloft.com] has joined #gitlab
+00:10 -!- DanKnox_ is now known as DanKnox
+00:45 -!- kamiyuki [~kamiyuki@ec2-54-251-98-220.ap-southeast-1.compute.amazonaws.com] has quit [Ping timeout: 256 seconds]
+00:46 -!- kamiyuki|me [~kamiyuki@ec2-54-251-98-220.ap-southeast-1.compute.amazonaws.com] has joined #gitlab
+00:46 -!- Blue_Ice [~Blue_Ice@unaffiliated/blue-ice/x-2052838] has quit [Ping timeout: 256 seconds]
+00:48 -!- Blue_Ice [~Blue_Ice@sid.dupas.be] has joined #gitlab
+00:48 -!- Blue_Ice [~Blue_Ice@sid.dupas.be] has quit [Changing host]
+00:48 -!- Blue_Ice [~Blue_Ice@unaffiliated/blue-ice/x-2052838] has joined #gitlab
+00:48 -!- zz_whg [whg@nat/ibm/x-kyqyvjswtdyywrws] has quit [Ping timeout: 245 seconds]
+00:48 -!- lbt [~david@78.32.229.233] has joined #gitlab
+00:48 -!- lbt [~david@78.32.229.233] has quit [Changing host]
+00:48 -!- lbt [~david@Maemo/community/contributor/lbt] has joined #gitlab
+00:49 -!- Arokh [~Arokh@v2201212146779796.yourvserver.net] has quit [Ping timeout: 256 seconds]
+00:49 -!- zz_whg [~whg@129.33.1.38] has joined #gitlab
+00:50 -!- Arokh [~Arokh@v2201212146779796.yourvserver.net] has joined #gitlab
+00:50 -!- zz_whg is now known as whg
+00:50 -!- whg [~whg@129.33.1.38] has quit [Changing host]
+00:50 -!- whg [~whg@unaffiliated/whg] has joined #gitlab
+00:55 -!- lbt_away [~david@78.32.229.233] has quit [Ping timeout: 256 seconds]
+00:55 -!- xx4h [~xx4h@178-26-108-48-dynip.superkabel.de] has quit [Ping timeout: 256 seconds]
+00:57 -!- notwen [james@unaffiliated/sindacious] has quit [Ping timeout: 246 seconds]
+00:58 -!- notwen [james@unaffiliated/sindacious] has joined #gitlab
+00:58 -!- klaernie [~kandre@mainframe.ak-online.be] has quit [Read error: Operation timed out]
+00:58 -!- xx4h [~xx4h@178-26-108-48-dynip.superkabel.de] has joined #gitlab
+00:59 -!- dewdrop [~dewdrop@2604:180::84d6:b1da] has joined #gitlab
+00:59 -!- dewdrop [~dewdrop@2604:180::84d6:b1da] has quit [Changing host]
+00:59 -!- dewdrop [~dewdrop@unaffiliated/dewdrop] has joined #gitlab
+01:00 -!- lbt_ [~david@78.32.229.233] has joined #gitlab
+01:00 -!- lbt_ [~david@78.32.229.233] has quit [Changing host]
+01:00 -!- lbt_ [~david@Maemo/community/contributor/lbt] has joined #gitlab
+01:01 -!- klaernie [~kandre@mainframe.ak-online.be] has joined #gitlab
+01:05 -!- Netsplit *.net <-> *.split quits: dewdrop_, lbt, jakedahn
+01:06 -!- Netsplit over, joins: jakedahn
+01:19 -!- axil42 [~axil42@snf-18326.vm.okeanos.grnet.gr] has joined #gitlab
+01:20 -!- jakedahn_ [~jakedahn@2001:4800:7810:512:24e6:44b4:ff04:9e19] has joined #gitlab
+01:23 -!- sbbodhtimrj [mith@vpn.home.jrbobdobbs.org] has joined #gitlab
+01:27 -!- Netsplit *.net <-> *.split quits: jakedahn
+01:27 -!- jakedahn_ is now known as jakedahn
+01:27 -!- Netsplit *.net <-> *.split quits: scalability-junk, geck, jrmithdobbs, lyda_
+01:27 -!- sbbodhtimrj is now known as jrmithdobbs
+01:31 -!- Netsplit over, joins: scalability-junk, lyda_
+01:38 -!- Netsplit *.net <-> *.split quits: bigjay, samael, cowmix, derf-, FFForever
+01:38 -!- geck [~geck@likeabos.com] has joined #gitlab
+01:43 -!- Netsplit over, joins: bigjay
+01:45 -!- Netsplit *.net <-> *.split quits: alexanderte
+01:45 -!- cowmix [~cowmix@soy.indirect.com] has joined #gitlab
+01:47 -!- FFForever [~FFForever@unaffiliated/ffforever] has joined #gitlab
+01:48 -!- Netsplit over, joins: alexanderte
+01:51 -!- derf- [derf@2600:3c03::f03c:91ff:feae:f3e3] has joined #gitlab
+01:51 -!- samael [~earendil@multivac.valis-e.com] has joined #gitlab
+02:01 -!- DanKnox is now known as DanKnox_away
+02:14 -!- Netsplit *.net <-> *.split quits: samael, derf-
+02:40 -!- DanKnox_away is now known as DanKnox
+02:48 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has quit [Quit: Jippi]
+03:00 -!- DvdKhl [~Arokh@v2201212146779796.yourvserver.net] has joined #gitlab
+03:01 -!- DanKnox is now known as DanKnox_away
+03:02 -!- dewdrop_ [~dewdrop@2604:180::84d6:b1da] has joined #gitlab
+03:02 -!- dewdrop_ [~dewdrop@2604:180::84d6:b1da] has quit [Changing host]
+03:02 -!- dewdrop_ [~dewdrop@unaffiliated/dewdrop] has joined #gitlab
+03:02 -!- samael [~earendil@multivac.valis-e.com] has joined #gitlab
+03:02 -!- derf- [derf@2600:3c03::f03c:91ff:feae:f3e3] has joined #gitlab
+03:04 -!- Arokh [~Arokh@v2201212146779796.yourvserver.net] has quit [Ping timeout: 245 seconds]
+03:04 -!- FFForever [~FFForever@unaffiliated/ffforever] has quit [Ping timeout: 245 seconds]
+03:04 -!- jrmithdobbs [mith@vpn.home.jrbobdobbs.org] has quit [Ping timeout: 245 seconds]
+03:04 -!- dewdrop [~dewdrop@unaffiliated/dewdrop] has quit [Read error: Connection reset by peer]
+03:04 -!- axil42 [~axil42@snf-18326.vm.okeanos.grnet.gr] has quit [Ping timeout: 245 seconds]
+03:04 -!- cowmix [~cowmix@soy.indirect.com] has quit [Excess Flood]
+03:05 -!- jrmithdobbs [mith@vpn.home.jrbobdobbs.org] has joined #gitlab
+03:05 -!- FFForever [~FFForever@198.98.53.36] has joined #gitlab
+03:05 -!- FFForever [~FFForever@198.98.53.36] has quit [Changing host]
+03:05 -!- FFForever [~FFForever@unaffiliated/ffforever] has joined #gitlab
+03:05 -!- FFForever [~FFForever@unaffiliated/ffforever] has quit [Excess Flood]
+03:06 -!- FFForever [~FFForever@unaffiliated/ffforever] has joined #gitlab
+03:06 -!- cowmix [~cowmix@soy.indirect.com] has joined #gitlab
+03:21 -!- DanKnox_away is now known as DanKnox
+03:22 -!- tmcmahon [~Thunderbi@wl64-130.lcom.net] has joined #gitlab
+03:55 -!- tmcmahon [~Thunderbi@wl64-130.lcom.net] has quit [Quit: tmcmahon]
+04:23 -!- DanKnox is now known as DanKnox_away
+04:40 -!- DanKnox_away is now known as DanKnox
+04:56 -!- DanKnox is now known as DanKnox_away
+05:02 -!- axil42 [~axil42@snf-18326.vm.okeanos.grnet.gr] has joined #gitlab
+05:11 -!- dsup [188e0e99@gateway/web/freenode/ip.24.142.14.153] has joined #gitlab
+05:14 < dsup> Hi
+05:14 -!- frd|afk [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has joined #gitlab
+05:14 < dsup> Any idea what is causing this error? https://ezcrypt.it/6s6n#3NfHcXM01ayjUezgAyk0IvKE
+05:15 < dsup> gitlab will not start, running 5.0
+05:23 -!- Netsplit *.net <-> *.split quits: frdmn
+05:36 -!- kenperkins [~textual@50-47-18-37.evrt.wa.frontiernet.net] has quit [Quit: Computer has gone to sleep.]
+05:47 -!- kenperkins [~textual@50-47-18-37.evrt.wa.frontiernet.net] has joined #gitlab
+09:55 -!- dsup [188e0e99@gateway/web/freenode/ip.24.142.14.153] has quit [Quit: Page closed]
+10:17 -!- DanKnox_away is now known as DanKnox
+10:26 -!- dragoon` [~dragoon@14-203-66-47.static.tpgi.com.au] has joined #gitlab
+10:43 -!- DanKnox is now known as DanKnox_away
+10:49 -!- DanKnox_away is now known as DanKnox
+11:14 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+11:14 -!- mkrause [~mkrause@77.60.209.193] has quit [Client Quit]
+11:15 -!- lbt_ is now known as lbt
+11:15 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+11:16 -!- DanKnox is now known as DanKnox_away
+11:28 -!- DanKnox_away is now known as DanKnox
+11:58 -!- DanKnox is now known as DanKnox_away
+12:00 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has joined #gitlab
+12:04 -!- DanKnox_away is now known as DanKnox
+12:05 -!- mkrause [~mkrause@77.60.209.193] has quit [Quit: mkrause]
+12:10 -!- zekefast [~zekefast@server.zekefast.org] has joined #gitlab
+12:10 -!- zekefast [~zekefast@server.zekefast.org] has quit [Client Quit]
+12:25 -!- asyd [~asyd@gendo.asyd.net] has joined #gitlab
+12:25 < asyd> hello guys! first thanks for this wonderful tools!
+12:26 < asyd> I'm trying to setup SAML authentication, I added the provider to the gem, configure it in gitlab.yml and devise.rb
+12:26 < asyd> but I guess there are somethrings wrong with routes
+12:27 < asyd> ActionController::RoutingError (No route matches [GET] "/assets/authbuttons/saml_32.png"):
+12:27 < asyd> for example
+12:27 < asyd> and got error 500 when hitting /users/auth/saml
+12:35 -!- MatToufoutu [~MaT@89.159.129.182] has joined #gitlab
+12:35 -!- MatToufoutu [~MaT@89.159.129.182] has quit [Changing host]
+12:35 -!- MatToufoutu [~MaT@unaffiliated/mattoufoutu] has joined #gitlab
+12:48 -!- dragoon` [~dragoon@14-203-66-47.static.tpgi.com.au] has left #gitlab []
+12:52 -!- DanKnox is now known as DanKnox_away
+13:05 -!- MatToufoutu [~MaT@unaffiliated/mattoufoutu] has quit [Quit: Quitte]
+13:20 -!- SomeoneWeird [~SomeoneWe@unaffiliated/someoneweird] has quit [Ping timeout: 246 seconds]
+13:26 -!- SomeoneWeird [~SomeoneWe@ec2-122-248-235-44.ap-southeast-1.compute.amazonaws.com] has joined #gitlab
+13:26 -!- SomeoneWeird is now known as Guest30326
+13:27 -!- Guest30326 [~SomeoneWe@ec2-122-248-235-44.ap-southeast-1.compute.amazonaws.com] has quit [Changing host]
+13:27 -!- Guest30326 [~SomeoneWe@unaffiliated/someoneweird] has joined #gitlab
+13:30 -!- Guest30326 is now known as SomeoneWeird
+14:02 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+15:08 -!- sygnous_ [~sygnous@ec2-54-236-218-74.compute-1.amazonaws.com] has quit [Changing host]
+15:08 -!- sygnous_ [~sygnous@unaffiliated/malikeye] has joined #gitlab
+15:08 -!- sygnous_ is now known as sygnous
+15:08 -!- sygnous is now known as malikeye
+15:08 -!- malikeye is now known as sygnous
+15:12 -!- tmcmahon [~Thunderbi@wl64-130.lcom.net] has joined #gitlab
+15:13 -!- tmcmahon [~Thunderbi@wl64-130.lcom.net] has quit [Client Quit]
+15:53 -!- mkrause [~mkrause@77.60.209.193] has quit [Quit: mkrause]
+16:13 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+16:27 < sygnous> java is such a mess on os x
+17:15 -!- mkrause_ [~mkrause@77.60.209.193] has joined #gitlab
+17:16 -!- dewdrop [~dewdrop@2604:180::84d6:b1da] has joined #gitlab
+17:16 -!- dewdrop [~dewdrop@2604:180::84d6:b1da] has quit [Changing host]
+17:16 -!- dewdrop [~dewdrop@unaffiliated/dewdrop] has joined #gitlab
+17:22 -!- lyda [~kevin@banshee.ie.suberic.net] has joined #gitlab
+17:23 -!- Corren [~textual@50-47-18-37.evrt.wa.frontiernet.net] has joined #gitlab
+17:24 -!- Netsplit *.net <-> *.split quits: dewdrop_, FFForever, scalability-junk, jrmithdobbs, kenperkins, mkrause, lyda_
+17:24 -!- mkrause_ is now known as mkrause
+17:26 -!- Netsplit over, joins: FFForever
+17:26 -!- asyd_ [~asyd@gendo.asyd.net] has joined #gitlab
+17:26 -!- hejki_ [~hejki@hoasnet-50dd1a-20.dhcp.inet.fi] has joined #gitlab
+17:28 -!- jrmithdobbs [mith@vpn.home.jrbobdobbs.org] has joined #gitlab
+17:29 -!- asyd [~asyd@gendo.asyd.net] has quit [Write error: Broken pipe]
+17:31 -!- hejki [~hejki@hoasnet-50dd1a-20.dhcp.inet.fi] has quit [Remote host closed the connection]
+18:25 -!- mkrause [~mkrause@77.60.209.193] has quit [Quit: mkrause]
+19:00 -!- Jippi [~cw@x1-6-20-4e-7f-c8-b9-ba.k396.webspeed.dk] has quit [Quit: Jippi]
+19:02 -!- mkrause [~mkrause@77.60.209.193] has joined #gitlab
+19:03 -!- DanKnox_away is now known as DanKnox
+19:17 -!- scalability-junk [uid6422@gateway/web/irccloud.com/x-rvaulfmvzrljdwce] has joined #gitlab
+19:28 -!- asyd_ is now known as asyd
+19:28 -!- MatToufoutu [~MaT@unaffiliated/mattoufoutu] has joined #gitlab
+19:40 -!- DanKnox is now known as DanKnox_away
+19:45 -!- DanKnox_away is now known as DanKnox
+20:01 -!- DanKnox is now known as DanKnox_away
+20:02 -!- Corren is now known as kenperkins
+20:03 -!- StR [~str@190.104.112.35] has joined #gitlab
+20:03 < StR> hi again :D
+20:04 < StR> I'm having problems installing gitlab, I get the following error message trying to bundle install it
+20:04 < StR> I get:   /home/gitlab/gitlab/Gemfile:14: syntax error, unexpected ':', expecting $end
+20:28 -!- StR [~str@190.104.112.35] has quit [Quit: Ex-Chat]
+20:56 -!- DanKnox_away is now known as DanKnox
+20:58 -!- zekefast [~zekefast@server.zekefast.org] has joined #gitlab
+21:47 -!- klaernie [~kandre@mainframe.ak-online.be] has quit [Read error: Operation timed out]
+21:51 -!- klaernie [~kandre@mainframe.ak-online.be] has joined #gitlab
+21:54 -!- DanKnox is now known as DanKnox_away
+22:03 -!- MatToufoutu [~MaT@unaffiliated/mattoufoutu] has quit [Remote host closed the connection]
+22:12 -!- zekefast [~zekefast@server.zekefast.org] has quit [Quit: Leaving.]
+22:16 -!- zekefast [~zekefast@server.zekefast.org] has joined #gitlab
+22:45 -!- mkrause [~mkrause@77.60.209.193] has quit [Quit: mkrause]
+22:52 -!- MatToufoutu [~MaT@AVelizy-551-1-20-139.w90-62.abo.wanadoo.fr] has joined #gitlab
+22:52 -!- MatToufoutu [~MaT@AVelizy-551-1-20-139.w90-62.abo.wanadoo.fr] has quit [Changing host]
+22:52 -!- MatToufoutu [~MaT@unaffiliated/mattoufoutu] has joined #gitlab
+22:53 -!- zekefast1 [~zekefast@server.zekefast.org] has joined #gitlab
+22:55 -!- zekefast1 [~zekefast@server.zekefast.org] has quit [Client Quit]
+22:56 -!- zekefast1 [~zekefast@server.zekefast.org] has joined #gitlab
+22:57 -!- zekefast [~zekefast@server.zekefast.org] has quit [Ping timeout: 264 seconds]
+23:52 -!- zekefast1 [~zekefast@server.zekefast.org] has quit [Quit: Leaving.]
+--- Day changed Mon May 13 2013
+00:21 -!- shreknet [~quassel@bbnetz.eu] has joined #gitlab
+01:51 -!- frd|afk [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has quit [Remote host closed the connection]
+01:52 -!- frdmn [~frdmn-esp@64.237.37.119] has joined #gitlab
+02:50 -!- frd|afk [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has joined #gitlab
+02:53 -!- frdmn [~frdmn-esp@64.237.37.119] has quit [Ping timeout: 248 seconds]
+03:48 -!- DanKnox_away is now known as DanKnox
+03:52 -!- DanKnox is now known as DanKnox_away
+04:12 -!- tmcmahon [~Thunderbi@wl64-130.lcom.net] has joined #gitlab
+04:24 -!- tmcmahon1 [~Thunderbi@wl64-130.lcom.net] has joined #gitlab
+04:24 -!- frdmn [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has joined #gitlab
+04:24 -!- asyd_ [~asyd@gendo.asyd.net] has joined #gitlab
+04:27 -!- tmcmahon [~Thunderbi@wl64-130.lcom.net] has quit [Ping timeout: 260 seconds]
+04:27 -!- asyd [~asyd@gendo.asyd.net] has quit [Ping timeout: 260 seconds]
+04:29 -!- frd|afk [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has quit [Ping timeout: 260 seconds]
+04:33 -!- tmcmahon1 [~Thunderbi@wl64-130.lcom.net] has quit [Quit: tmcmahon1]
+04:33 -!- realityloop is now known as realityloopAFK
+04:47 -!- Netsplit *.net <-> *.split quits: asyd_
+04:48 -!- asyd [~asyd@gendo.asyd.net] has joined #gitlab
+05:24 -!- kenperkins [~textual@50-47-18-37.evrt.wa.frontiernet.net] has quit [Ping timeout: 256 seconds]
+05:25 -!- kenperkins [~textual@50-47-18-37.evrt.wa.frontiernet.net] has joined #gitlab
+06:23 < j1mc> i set up an instance of gitlab late yesterday, and i've got to say that it's great. thanks so much to all of you for your work on it.
+07:07 -!- DvdKhl [~Arokh@v2201212146779796.yourvserver.net] has quit [Quit: Gone]
+07:16 -!- frdmn [~frdmn-esp@178-27-214-253-dynip.superkabel.de] has quit [Quit: Linkinus - http://linkinus.com]
+08:11 -!- frdmn [~frdmn-esp@iwelt16.iwelt.de] has joined #gitlab
+08:57 -!- MatToufoutu [~MaT@unaffiliated/mattoufoutu] has quit [Remote host closed the connection]
+09:29 < hejki_> ohai, can i somehow enable --ff-only merges (running GitLab 5.1)
+09:55 < bigjay> re
+10:23 -!- giany [~giany@shifu.x83.org] has quit [Read error: Operation timed out]
+10:25 -!- clone1018_ [quasselcor@freq.in] has quit [Ping timeout: 256 seconds]
+10:26 -!- j1mc [uid7188@gateway/web/irccloud.com/x-fudoxieqiilivesc] has quit [Ping timeout: 256 seconds]
+10:27 -!- Netsplit *.net <-> *.split quits: whg, geck, jrmithdobbs, axil42, alexanderte, beatpanic, sygnous, lbt, kamiyuki|me, hejki_,  (+33 more, use /NETSPLIT to show all of them)
+10:32 -!- Netsplit over, joins: jrmithdobbs
+10:32 -!- j1mc [uid7188@pdpc/supporter/active/j1mc] has joined #gitlab
+10:32 -!- clone1018 [quasselcor@freq.in] has joined #gitlab
+10:32 -!- lyda_ [~kevin@banshee.ie.suberic.net] has joined #gitlab
+10:32 -!- giany_ [~giany@shifu.x83.org] has joined #gitlab
+10:32 -!- dewdrop_ [~dewdrop@unaffiliated/dewdrop] has joined #gitlab
+10:32 -!- Netsplit over, joins: frdmn, kenperkins, asyd, shreknet, klaernie, scalability-junk, hejki_, FFForever, SomeoneWeird, axil42 (+30 more)
+10:34 -!- Iszak [~Iszak@unaffiliated/supavisah] has joined #gitlab
+10:36 -!- Netsplit *.net <-> *.split quits: whg, geck, jrmithdobbs, axil42, alexanderte, beatpanic, sygnous, lbt, kamiyuki|me, hejki_,  (+37 more, use /NETSPLIT to show all of them)
+10:37 -!- Netsplit over, joins: Iszak, jrmithdobbs, j1mc, clone1018, lyda_, giany_, dewdrop_, frdmn, kenperkins, asyd (+37 more)
+10:43 -!- Iszak [~Iszak@unaffiliated/supavisah] has quit [Ping timeout: 246 seconds]
+10:45 -!- Iszak [~Iszak@unaffiliated/supavisah] has joined #gitlab
+11:09 -!- Jippi [~cw@0607ds5-by.0.fullrate.dk] has joined #gitlab
+12:14 < bigjay> !seen dblessing
+12:14 < bigjay> hmm, no bot here ...
