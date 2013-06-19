@@ -125,7 +125,7 @@ Overall we're still unsure about the cause of this additional activity during th
 
 ## Disclaimer
 
-<!-- TODO We are aware of the acadamic failure :p -->
+We are aware of the fact that our metrics are self invented and not sufficiently supported by scientific arguments. We created the measurements just to give a general idea about the metrics of the GitLab system. We hope that our results raise awareness about the topics covered and may act as a basis for further investigation.
 
 ## References
 The following documents are referred to in this article:
@@ -136,7 +136,7 @@ The following documents are referred to in this article:
 
 Our raw data is available for study in the following files:
 
-* [Dependency counts over time](metrics/dependencies.csv)
-* [GitHub issue activity](metrics/github_issues.csv)
-* [Forum issue activity](metrics/forum.csv)
-* [StackOverflow activity]() <!--- TODO, @erikvd1, do you have this data as well? -->
+* Dependency counts over time [(CSV)](metrics/dependencies.csv) [(Spreadsheet)](https://docs.google.com/spreadsheet/ccc?key=0AmEuVP6u2rPkdGJVWnZrZ1M0eUJOMXpFZ0pxMkVtYXc)
+* GitHub issue activity [(CSV)](metrics/github_issues.csv) [(Spreadsheet)](https://docs.google.com/spreadsheet/ccc?key=0Aq4KHUeJZqaMdDJDMmdvQnoyR1JrS0xtc2ZoQngyNVE#gid=2)
+* Google Groups issue activity [(CSV)](metrics/googlegroups_issues.csv) [(Spreadsheet)](https://docs.google.com/spreadsheet/ccc?key=0Aq4KHUeJZqaMdDJDMmdvQnoyR1JrS0xtc2ZoQngyNVE#gid=0)
+* StackOverflow activity [(CSV)](metrics/stackoverflow_issues.csv) [(Spreadsheet)](https://docs.google.com/spreadsheet/ccc?key=0Aq4KHUeJZqaMdDJDMmdvQnoyR1JrS0xtc2ZoQngyNVE#gid=1)
