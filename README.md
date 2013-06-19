@@ -1,9 +1,4 @@
----
-title: GitLab architectural analysis documents
----
-
-# GitLab project
-
+# GitLab architectural analysis documents
 
 ## Results
 
