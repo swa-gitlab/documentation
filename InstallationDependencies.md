@@ -1,5 +1,5 @@
 # Installation Dependencies
-When going through the [installation guide](https://github.com/delftswa/gitlab/blob/master/doc/install/installation.md), the following dependencies were detected.
+When going through the [installation guide](https://github.com/gitlabhq/gitlabhq/blob/master/doc/install/installation.md), the following dependencies were detected.
 
 ## Unix packages
 In order to install gitlab on a webserver, the following Unix packages need to be installed in the case of a Debian / Ubuntu server:
