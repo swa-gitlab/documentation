@@ -1,7 +1,3 @@
----
-title: Stakeholders
----
-
 # GitLab Stakeholder Analysis
 
 ## Table of Contents
@@ -27,7 +23,7 @@ title: Stakeholders
 
 GitLab is a self-hosted Git management system that has been in (public) development since October 2011. Over the years it has received commits from at least a hundred different contributors, has been starred by more than 8,000 people and forked by more than 1,800. This popularity naturally brings with it a lot of stakeholders who have some interest in the project, and whose concerns are important to take into consideration.
 
-In this document we select and analyze GitLab's stakeholders based on the methods suggested by Rozansky and Woods (R&W) in their book *Software Systems Architecture*. The goal of this analysis is to enable better discussion on recent open GitLab issues.
+In this document we select and analyze GitLab's stakeholders based on the methods suggested by Rozanski and Woods (R&W) in their book *Software Systems Architecture*. The goal of this analysis is to enable better discussion on recent open GitLab issues.
 
 
 ## Sources

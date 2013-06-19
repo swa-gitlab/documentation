@@ -1,14 +1,10 @@
----
-title: Context View
----
-
 # GitLab Context View
 
 ## Introduction
 
 As John Donne might say, *no system is an island, entire of itself*. All systems operate in some larger environment, interacting with stakeholders or external systems. Because the system context is very relevant to the software architecture, it is important to include a description of this context as part of the architectural description.
 
-We will make use of a viewpoint-based architectural approach as described by Rozansky and Woods, in particular the *Context Viewpoint* as described in [1], [2].
+We will make use of a viewpoint-based architectural approach as described by Rozanski and Woods, in particular the *Context Viewpoint* as described in [1], [2].
 
 This document presents a context view for GitLab. It defines the scope of the system – what it does and does not do, where the boundaries are between it and the outside world. In addition, it identifies external entities, defining the relationships, dependencies, and interactions between GitLab and these entities.
 
@@ -59,7 +55,7 @@ The site-related entities don't interact with GitLab directly (although GitLab C
 
 
 ### Larger scenario: Enterprise user Erik
-As an enterprise user, I'm using GitLab in my organization to store the code used by multiple development teams. In my organisation we use Atlassian JIRA to track issues and plan our work, which integrates with GitLab. For user authentication we rely on our enterprise LDAP server and we have separate departments handling operations and administration of the system. Because of the large amount of developers working on projects we use GitLab CI to create builds and run tests.
+As an enterprise user, I'm using GitLab in my organization to store the code used by multiple development teams. For user authentication we rely on our enterprise LDAP server and we have separate departments handling operations and administration of the system. Because of the large amount of developers working on projects we use GitLab CI to create builds and run tests.
 
 **People:**
 
@@ -70,17 +66,10 @@ As an enterprise user, I'm using GitLab in my organization to store the code use
 
 | Name             | Nature     | Owner             | Responsibilities |
 |------------------|------------|-------------------|------------------|
-| JIRA             | System     | Operations dept.  | Issue tracker |
 | LDAP server      | System     | Operations dept.  | Providing user authentication and authorization information |
 | GitLab CI        | System     | Operations dept.  | Checking the build state of software |
 
 GitLab can integrate with each of these entities, either out of the box or through plug-ins.
-
-
-<!-- Potential third scenario. Doesn't seem to add anything useful, so it's commented out.
-### Service architecture: GitLab-as-a-Server provider Paddy
-Large / complex setup?
--->
 
 ## Context View
 
@@ -149,7 +138,7 @@ Furthermore, when we see what data is transferred from the GitLab CI server back
 
 ### Context Diagram
 
-![Context diagram](ContextDiagram.png)
+![Context diagram](images/ContextDiagram.png)
 
 In this diagram, GitLab is treated as a black box. The external entities – systems as well as people – that we identified above are incorporated. Arrows indicate data flows. The direction of open arrows indicate the direction of a request. Closed arrows are data reads/writes.
 

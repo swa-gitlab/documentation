@@ -9,6 +9,11 @@ title: GitLab architectural analysis documents
 
 The following documents contain our project results:
 
-* W3. [Stakeholders](Stakeholders.md)
-* W4. [Metrics](Metrics.md)
-* W5. [Context view](ContextView.md)
+* [Stakeholders](Stakeholders.md)
+* [Metrics](Metrics.md)
+* [Measurements](Measurements.md)
+* [Context view](ContextView.md)
+* [Development view](DevelopmentView.md)
+* [Deployment view](DeploymentView.md)
+* [Installation dependencies](InstallationDependencies.md)
+

@@ -1,7 +1,3 @@
----
-title: Metrics
----
-
 # Metrics
 
 In this document we construct a variety of metrics for the GitLab project according to the [GQM (Goal Question Metric)](http://fub-taslim.googlecode.com/svn/trunk/WEMSE/INSTICC_Conference_Latex/gqm.pdf) format.
@@ -26,6 +22,7 @@ The table below shows our complete QGM model. In the following chapters, each qu
 | **Question** | Q3 | To what extend are external dependencies of GitLab responsible for installation issues? |
 | **Metrics**  | M1 | % of installation issues about dependencies |
 |              | M2 | (Number of dependencies / number of installation issues posted) |
+|              | M3 | Number of dependencies over time
 
 ## Goal
 
@@ -69,3 +66,6 @@ We can look at the issues that are about dependencies during installation, expre
 
 #### M2. (Number of dependencies / number of installation issues posted)
 We can also try to look for a relation between the number of dependencies of the project and the numbr of installation issues posted in a certain period, for instance the current month. If the number of installation issues increases when more dependencies are added, the two may be correlated. For the measure concerned with the number of dependecies, the entity is defined as the project, the attribute is the number of dependencies, the values are mapped onto a *ratio* scale. For the measure concerned with the number of installation issues, the entity is defined as a collection of issues about the installation process. The attribute is the topic of the issue and the date it was posted and the values are mapped onto a *nominal* scale (relevant or not relevant), which are then counted providing us with a number on a *ratio* scale. The resulting ratio is obviously also mapped onto a *ratio* scale.
+
+#### M3. Number of dependencies
+Finally we study the trend of the number of dependencies over time. The entity of this metric is defined as the project, the attribute is the number of dependencies, the values are mapped onto a *ratio* scale. We can measure this metric at multiple intervals in order to determine what the trend of the number of dependencies is doing.

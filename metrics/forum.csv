@@ -1,0 +1,23 @@
+Date,Total issues,Installation issues*,Dependency issues**,New installation issues,Open installation issues
+Nov 2011,3,0,0,0,N/A
+Dec 2011,13,6,0,6,N/A
+Jan 2012,26,11,0,5,N/A
+Feb 2012,40,17,1,6,N/A
+Mar 2012,83,32,4,15,N/A
+Apr 2012,124,45,11,13,N/A
+May 2012,153,54,13,9,N/A
+Jun 2012,183,70,17,16,N/A
+Jul 2012,233,85,22,15,N/A
+Aug 2012,276,98,25,13,N/A
+Sep 2012,303,106,29,8,N/A
+Oct 2012,351,124,33,18,N/A
+Nov 2012,411,151,42,27,N/A
+Dec 2012,470,174,50,23,N/A
+Jan 2013,578,223,64,49,N/A
+Feb 2013,676,244,74,21,N/A
+Mar 2013,756,256,81,12,N/A
+Apr 2013,881,261,96,5,N/A
+May 2013,964,270,110,9,N/A
+,,,,,
+* (install OR installation OR deployment),,,,,
+"** (install OR installation OR deployment) AND (""bundle install"" OR gem OR dependency)",,,,,
